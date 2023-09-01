@@ -1,0 +1,62 @@
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSp-Bold-fe1cfc14b7498b187c78fa72fb72d148.woff2') format('woff2');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSp-Book-4eaffdf96f4c6f984686e93d5d9cb325.woff2') format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'CircularSpTitle';
+    src: url('./assets/fonts/CircularSpTitle-Black-3f9afb402080d53345ca1850226ca724.woff2') format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2') format('woff2');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSpTitle-Tall-Bold-69995af8079e90f1d15130df13ad0c60.woff2') format('woff2');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'Spoticon';
+    src: url('./assets/fonts/spoticon_regular_2.d728648c.woff2') format('woff2');
+    font-weight: 400;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --text-white: #ffffff;
+
+    --background-black: #000000;
+
+    --font-family: 'CircularSp', sans-serif
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.6rem;
+    color: var(--text-white);
+    background-color: var(--background-black);
+}

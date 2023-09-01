@@ -1,0 +1,11 @@
+.btn {
+    margin-left: 32px;
+    height: 100%;
+    font-weight: 700;
+    border-radius: 5rem;
+    transition: all 0.2s ease;
+
+    &:hover {
+        transform: scale(1.04);
+    }
+}

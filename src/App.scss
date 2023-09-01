@@ -83,6 +83,11 @@ a {
 }
 
 button {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    letter-spacing: 1px;
     border: none;
 }
 

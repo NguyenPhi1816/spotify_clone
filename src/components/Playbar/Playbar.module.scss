@@ -10,3 +10,20 @@
     );
     background-image: linear-gradient(90deg, #af2896, #509bf5);
 }
+
+.not-logged-in {
+    padding: 11px 24px 7px 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.p1 {
+    font-size: 12px;
+    text-transform: uppercase;
+}
+
+.btn {
+    height: 48px;
+    font-size: 1.6rem;
+}

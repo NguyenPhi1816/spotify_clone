@@ -1,6 +1,8 @@
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 
+import Button from '../Button';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
@@ -33,15 +35,14 @@ function Sidebar() {
             </div>
             <div className={cx('item', 'body')}>
                 <div className={cx('body-container')}>
-                    <div className={cx('list-item', 'p-s')}>
+                    <div className={cx('list-item', 'p-s', 'd-g')}>
                         <div>
                             <FontAwesomeIcon icon={faCompactDisc} />
                             <span>Thư viện</span>
-                            <div className={cx('icons')}>
-                                <FontAwesomeIcon
-                                    icon={faPlus}
-                                    className={cx('plus')}
-                                />
+                        </div>
+                        <div className={cx('icons')}>
+                            <div className={cx('plus')}>
+                                <FontAwesomeIcon icon={faPlus} />
                             </div>
                         </div>
                     </div>
@@ -54,9 +55,12 @@ function Sidebar() {
                             <p className={cx('acticle-content')}>
                                 Rất dễ! Chúng tôi sẽ giúp bạn
                             </p>
-                            <button className={cx('article-btn')}>
-                                Tạo danh sách phát
-                            </button>
+                            <div className="btn">
+                                <Button
+                                    content="Tạo danh sách phát"
+                                    customFontSize="14px"
+                                />
+                            </div>
                         </div>
 
                         <div className={cx('article')}>
@@ -67,57 +71,12 @@ function Sidebar() {
                                 Chúng tôi sẽ cập nhật thông tin cho bạn về các
                                 tập mới
                             </p>
-                            <button className={cx('article-btn')}>
-                                Duyệt xem podcast
-                            </button>
-                        </div>
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Hãy cùng tìm và theo dõi một số podcast
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Chúng tôi sẽ cập nhật thông tin cho bạn về các
-                                tập mới
-                            </p>
-                            <button className={cx('article-btn')}>
-                                Duyệt xem podcast
-                            </button>
-                        </div>
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Hãy cùng tìm và theo dõi một số podcast
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Chúng tôi sẽ cập nhật thông tin cho bạn về các
-                                tập mới
-                            </p>
-                            <button className={cx('article-btn')}>
-                                Duyệt xem podcast
-                            </button>
-                        </div>
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Hãy cùng tìm và theo dõi một số podcast
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Chúng tôi sẽ cập nhật thông tin cho bạn về các
-                                tập mới
-                            </p>
-                            <button className={cx('article-btn')}>
-                                Duyệt xem podcast
-                            </button>
-                        </div>
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Hãy cùng tìm và theo dõi một số podcast
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Chúng tôi sẽ cập nhật thông tin cho bạn về các
-                                tập mới
-                            </p>
-                            <button className={cx('article-btn')}>
-                                Duyệt xem podcast
-                            </button>
+                            <div className="btn">
+                                <Button
+                                    content="Duyệt xem Podcast"
+                                    customFontSize="14px"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -1,30 +1,35 @@
 @font-face {
     font-family: 'CircularSp';
-    src: url('./assets/fonts/CircularSp-Bold-fe1cfc14b7498b187c78fa72fb72d148.woff2') format('woff2');
+    src: url('./assets/fonts/CircularSp-Bold-fe1cfc14b7498b187c78fa72fb72d148.woff2')
+        format('woff2');
     font-weight: 700;
 }
 
 @font-face {
     font-family: 'CircularSp';
-    src: url('./assets/fonts/CircularSp-Book-4eaffdf96f4c6f984686e93d5d9cb325.woff2') format('woff2');
+    src: url('./assets/fonts/CircularSp-Book-4eaffdf96f4c6f984686e93d5d9cb325.woff2')
+        format('woff2');
     font-weight: 400;
 }
 
 @font-face {
     font-family: 'CircularSpTitle';
-    src: url('./assets/fonts/CircularSpTitle-Black-3f9afb402080d53345ca1850226ca724.woff2') format('woff2');
+    src: url('./assets/fonts/CircularSpTitle-Black-3f9afb402080d53345ca1850226ca724.woff2')
+        format('woff2');
     font-weight: 400;
 }
 
 @font-face {
     font-family: 'CircularSp';
-    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2') format('woff2');
+    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2')
+        format('woff2');
     font-weight: 700;
 }
 
 @font-face {
     font-family: 'CircularSp';
-    src: url('./assets/fonts/CircularSpTitle-Tall-Bold-69995af8079e90f1d15130df13ad0c60.woff2') format('woff2');
+    src: url('./assets/fonts/CircularSpTitle-Tall-Bold-69995af8079e90f1d15130df13ad0c60.woff2')
+        format('woff2');
     font-weight: 600;
 }
 
@@ -42,10 +47,18 @@
 
 :root {
     --text-white: #ffffff;
+    --text-grey: #a7a7a7;
 
     --background-black: #000000;
+    --background-base: #121212;
+    --background-grey: #242424;
 
-    --font-family: 'CircularSp', sans-serif
+    --font-family: 'CircularSp', sans-serif;
+
+    --panel-gap: 8px;
+    --border-radius: 8px;
+    --sidebar-width: 353px;
+    --navbar-height: 64px;
 }
 
 html {
@@ -57,6 +70,35 @@ body {
     font-family: var(--font-family);
     font-weight: 400;
     font-size: 1.6rem;
+    line-height: 1.5;
+    letter-spacing: 1px;
     color: var(--text-white);
     background-color: var(--background-black);
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    color: var(--text-white);
+}
+
+button {
+    border: none;
+}
+
+//scrollbar
+html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 4px;
+    height: 4px;
+}
+
+html *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+html *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
 }

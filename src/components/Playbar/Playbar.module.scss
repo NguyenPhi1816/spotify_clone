@@ -1,0 +1,12 @@
+.container {
+    width: 100%;
+    min-height: 66px;
+    background-image: -webkit-gradient(
+        linear,
+        left top,
+        right top,
+        from(#af2896),
+        to(#509bf5)
+    );
+    background-image: linear-gradient(90deg, #af2896, #509bf5);
+}

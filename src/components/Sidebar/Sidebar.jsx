@@ -1,6 +1,8 @@
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 
+import { Link } from 'react-router-dom';
+
 import Button from '../Button';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -20,16 +22,16 @@ function Sidebar() {
             <div className={cx('item', 'top')}>
                 <ul className={cx('top-list')}>
                     <li className={cx('list-item', 'active')}>
-                        <a href="/">
+                        <Link to="/">
                             <FontAwesomeIcon icon={faHouse} />
                             <span>Trang chủ</span>
-                        </a>
+                        </Link>
                     </li>
                     <li className={cx('list-item')}>
-                        <a href="/">
+                        <Link to="/search">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
                             <span>Tìm kiếm</span>
-                        </a>
+                        </Link>
                     </li>
                 </ul>
             </div>

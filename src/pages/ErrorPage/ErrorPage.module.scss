@@ -1,0 +1,29 @@
+.container {
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+
+    & > h1 {
+        font-size: 48px;
+        font-weight: 700;
+        margin: 40px 0px 16px;
+    }
+
+    & > p {
+        margin: 0 0 40px;
+    }
+}
+
+.home-page-btn,
+.help-btn {
+    margin: 0 0 36px;
+}

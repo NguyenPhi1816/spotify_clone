@@ -1,13 +1,11 @@
-import MainLayout from "./layouts/MainLayout"
-import "./App.scss"
+import './App.scss';
 
-function App() {
-
-  return (
-    <>
-      <MainLayout/>
-    </>
-  )
+function App({ Component }) {
+    return (
+        <>
+            <Component />
+        </>
+    );
 }
 
-export default App
+export default App;

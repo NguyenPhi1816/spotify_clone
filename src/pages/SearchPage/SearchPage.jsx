@@ -8,10 +8,10 @@ import Categories from '../../components/Categories';
 function SearchPage() {
     return (
         <MainLayout
-            Sidebar={Sidebar}
-            Navbar={Navbar}
-            Content={Categories}
-            Playbar={Playbar}
+            Sidebar={<Sidebar />}
+            Navbar={<Navbar showSearchBar />}
+            Content={<Categories />}
+            Playbar={<Playbar />}
         />
     );
 }

@@ -4,22 +4,33 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
     faChevronLeft,
     faChevronRight,
+    faMagnifyingGlass,
 } from '@fortawesome/free-solid-svg-icons';
 
 import Button from '../Button';
 
 const cx = classNames.bind(styles);
 
-function Navbar() {
+function Navbar({ showSearchBar = false }) {
     return (
         <nav className={cx('container')}>
             <div className={cx('wrapper')}>
                 <div className={cx('navigation-btns')}>
-                    <div>
+                    <div className={cx('navigation-btn')}>
                         <FontAwesomeIcon icon={faChevronLeft} />
                     </div>
-                    <div>
+                    <div className={cx('navigation-btn')}>
                         <FontAwesomeIcon icon={faChevronRight} />
+                    </div>
+                    <div
+                        className={cx('search-bar', { isHide: !showSearchBar })}
+                    >
+                        <label className={cx('form-group')}>
+                            <div className={cx('icon')}>
+                                <FontAwesomeIcon icon={faMagnifyingGlass} />
+                            </div>
+                            <input placeholder="Bạn muốn nghe gì?" />
+                        </label>
                     </div>
                 </div>
                 <div className={cx('register-login')}>

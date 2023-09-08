@@ -8,10 +8,10 @@ import Playbar from '../../components/Playbar';
 function HomePage() {
     return (
         <MainLayout
-            Sidebar={Sidebar}
-            Navbar={Navbar}
-            Content={Content}
-            Playbar={Playbar}
+            Sidebar={<Sidebar />}
+            Navbar={<Navbar />}
+            Content={<Content />}
+            Playbar={<Playbar />}
         />
     );
 }

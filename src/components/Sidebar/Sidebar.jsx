@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 import Button from '../Button';
 
@@ -17,17 +17,30 @@ import {
 const cx = classNames.bind(styles);
 
 function Sidebar() {
+    const location = useLocation();
+    const currentPath = location.pathname;
+
+    console.log(currentPath);
+
     return (
         <nav className={cx('container')}>
             <div className={cx('item', 'top')}>
                 <ul className={cx('top-list')}>
-                    <li className={cx('list-item', 'active')}>
+                    <li
+                        className={cx('list-item', {
+                            active: currentPath === '/',
+                        })}
+                    >
                         <Link to="/">
                             <FontAwesomeIcon icon={faHouse} />
                             <span>Trang chủ</span>
                         </Link>
                     </li>
-                    <li className={cx('list-item')}>
+                    <li
+                        className={cx('list-item', {
+                            active: currentPath === '/search',
+                        })}
+                    >
                         <Link to="/search">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
                             <span>Tìm kiếm</span>

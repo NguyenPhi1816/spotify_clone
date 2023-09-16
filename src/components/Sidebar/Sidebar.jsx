@@ -1,6 +1,7 @@
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import Button from '../Button';
@@ -9,10 +10,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 import {
     faCompactDisc,
+    faFolder,
     faHouse,
     faMagnifyingGlass,
+    faMusic,
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
+import HeadlessTippy from '../HeadlessTippy';
 
 const cx = classNames.bind(styles);
 
@@ -20,7 +24,9 @@ function Sidebar() {
     const location = useLocation();
     const currentPath = location.pathname;
 
-    console.log(currentPath);
+    const [show, setShow] = useState(false);
+
+    const handleShowToolTip = () => setShow((prev) => !prev);
 
     return (
         <nav className={cx('container')}>
@@ -56,9 +62,66 @@ function Sidebar() {
                             <span>Thư viện</span>
                         </div>
                         <div className={cx('icons')}>
-                            <div className={cx('plus')}>
-                                <FontAwesomeIcon icon={faPlus} />
-                            </div>
+                            <HeadlessTippy
+                                items={
+                                    <div className={cx('tippy')}>
+                                        <Button
+                                            className={cx('tippy-btn')}
+                                            noBackground
+                                            content={
+                                                <span
+                                                    className={cx(
+                                                        'tippy-btn-content',
+                                                    )}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faMusic}
+                                                    />
+                                                    <p>
+                                                        Tạo danh sách phát mới
+                                                    </p>
+                                                </span>
+                                            }
+                                        />
+                                        <Button
+                                            className={cx('tippy-btn')}
+                                            noBackground
+                                            content={
+                                                <span
+                                                    className={cx(
+                                                        'tippy-btn-content',
+                                                    )}
+                                                >
+                                                    <FontAwesomeIcon
+                                                        icon={faFolder}
+                                                    />
+                                                    <p>
+                                                        Tạo thư mục danh sách
+                                                        phát
+                                                    </p>
+                                                </span>
+                                            }
+                                        />
+                                    </div>
+                                }
+                                show={show}
+                                setShow={setShow}
+                                referenceClientRect={{
+                                    width: 100,
+                                    height: 100,
+                                    left: 378,
+                                    right: 0,
+                                    top: 70,
+                                    bottom: 0,
+                                }}
+                            >
+                                <div
+                                    className={cx('plus', 'icon')}
+                                    onClick={() => handleShowToolTip()}
+                                >
+                                    <FontAwesomeIcon icon={faPlus} />
+                                </div>
+                            </HeadlessTippy>
                         </div>
                     </div>
 

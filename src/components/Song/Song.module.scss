@@ -1,0 +1,117 @@
+.container {
+    padding: 0 22px;
+
+    & > *a:hover {
+        color: var(--text-white);
+        text-decoration: underline;
+    }
+}
+
+.wrapper {
+    padding: 0 16px;
+    width: 100%;
+    height: 56px;
+    display: grid;
+    grid-gap: 16px;
+    grid-template-columns: 16px 6fr 4fr 3fr minmax(120px, 1fr);
+    border-radius: var(--border-radius);
+
+    & > * {
+        align-self: center;
+    }
+
+    &:hover {
+        background-color: hsla(0, 0%, 100%, 0.1);
+
+        .var1 > *a,
+        .album {
+            color: var(--text-white);
+        }
+
+        .fav-btn,
+        .ellipsis {
+            visibility: visible;
+        }
+
+        .icon-play {
+            display: block;
+        }
+
+        .index {
+            display: none;
+        }
+    }
+}
+
+.index {
+    width: 16px;
+}
+
+.first {
+    display: flex;
+    align-items: center;
+}
+
+.var1 {
+    width: 100%;
+
+    .artists {
+        & > a,
+        & > p {
+            display: inline;
+        }
+    }
+}
+
+.thumb {
+    margin-right: 16px;
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+}
+
+.ellipsis {
+    background-color: transparent;
+}
+
+.name,
+.artists {
+    width: 100%;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    display: -webkit-box;
+    white-space: unset;
+    word-break: break-all;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.artists > a,
+.artists > p,
+.album,
+.created-at,
+.duration,
+.ellipsis,
+.index {
+    font-size: 1.4rem;
+    color: var(--text-grey);
+}
+
+.last {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.fav-btn,
+.ellipsis {
+    visibility: hidden;
+
+    &:hover {
+        color: var(--text-white);
+    }
+}
+
+.icon-play {
+    display: none;
+}

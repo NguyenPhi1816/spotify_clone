@@ -38,7 +38,7 @@ function Navbar({ showSearchBar = false }) {
                         <Button content="Đăng ký" noBackground />
                     </div>
                     <div className={cx('btn')}>
-                        <Button content="Đăng nhập" />
+                        <Button content="Đăng nhập" gap="32px" />
                     </div>
                 </div>
             </div>

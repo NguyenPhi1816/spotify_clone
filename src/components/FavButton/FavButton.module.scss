@@ -1,0 +1,16 @@
+.fav-btn {
+    padding: 10px;
+    background-color: transparent;
+
+    &:hover {
+        transform: scale(1.05);
+
+        & > svg {
+            color: var(--text-white);
+        }
+    }
+
+    & > svg {
+        color: var(--text-grey);
+    }
+}

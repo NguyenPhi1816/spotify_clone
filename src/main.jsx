@@ -6,6 +6,7 @@ import App from './App.jsx';
 import HomePage from './pages/HomePage';
 import ErrorPage from './pages/ErrorPage';
 import SearchPage from './pages/SearchPage';
+import PlaylistPage from './pages/PlaylistPage/PlaylistPage.jsx';
 
 const router = createBrowserRouter([
     {
@@ -16,6 +17,10 @@ const router = createBrowserRouter([
     {
         path: '/search',
         element: <App Component={SearchPage} />,
+    },
+    {
+        path: '/playlist/:id',
+        element: <App Component={PlaylistPage} />,
     },
 ]);
 

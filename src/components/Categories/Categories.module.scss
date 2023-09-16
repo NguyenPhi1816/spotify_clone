@@ -1,0 +1,24 @@
+.container {
+    padding: 24px;
+    background-color: var(--background-base);
+}
+
+.wrapper {
+    padding: 16px 0;
+}
+
+.header {
+    padding: 18px 0;
+}
+
+.list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    column-gap: 24px;
+    row-gap: 24px;
+
+    & > li {
+        list-style: none;
+        aspect-ratio: 1;
+    }
+}

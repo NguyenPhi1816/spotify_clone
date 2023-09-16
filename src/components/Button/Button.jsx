@@ -12,6 +12,7 @@ function Button({
     content = '',
     customFontSize = '16px',
     noBackground = false,
+    gap,
 }) {
     let Component = 'button';
     const props = {};
@@ -27,8 +28,8 @@ function Button({
     return (
         <Component
             className={cx('btn', className)}
-            style={
-                !noBackground
+            style={{
+                ...(!noBackground
                     ? {
                           fontSize: customFontSize,
                           padding:
@@ -40,8 +41,9 @@ function Button({
                           fontSize: customFontSize,
                           color: 'var(--text-grey)',
                           backgroundColor: 'transparent',
-                      }
-            }
+                      }),
+                ...(gap ? { marginLeft: gap } : { marginLeft: '0px' }),
+            }}
             {...props}
         >
             {content}

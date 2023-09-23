@@ -13,6 +13,8 @@ function Button({
     customFontSize = '16px',
     noBackground = false,
     gap,
+    style,
+    onClick,
 }) {
     let Component = 'button';
     const props = {};
@@ -27,19 +29,19 @@ function Button({
 
     return (
         <Component
+            onClick={onClick}
             className={cx('btn', className)}
             style={{
+                ...style,
+                fontSize: customFontSize,
                 ...(!noBackground
                     ? {
-                          fontSize: customFontSize,
                           padding:
                               customFontSize == '14px'
                                   ? '4px 16px'
                                   : '8px 32px',
                       }
                     : {
-                          fontSize: customFontSize,
-                          color: 'var(--text-grey)',
                           backgroundColor: 'transparent',
                       }),
                 ...(gap ? { marginLeft: gap } : { marginLeft: '0px' }),

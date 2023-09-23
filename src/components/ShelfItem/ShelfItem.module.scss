@@ -1,3 +1,8 @@
+.link {
+    width: 100%;
+    height: 100%;
+}
+
 .container {
     padding: 16px;
     width: 100%;
@@ -20,6 +25,24 @@
 .top {
     position: relative;
     width: 100%;
+    height: 65%;
+}
+
+.body {
+    padding: 16px 0 0;
+
+    & > p {
+        // height: 60%;
+        width: 100%;
+        margin-top: 4px;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        white-space: unset;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 }
 
 .thumb-container {
@@ -30,6 +53,7 @@
         width: 100%;
         height: 100%;
         object-fit: cover;
+        border-radius: 4px;
     }
 }
 

@@ -6,6 +6,25 @@
     gap: var(--panel-gap);
 }
 
+.logo {
+    display: flex;
+    align-items: center;
+
+    & > img {
+        width: 24px;
+        height: 24px;
+        object-fit: cover;
+        border-radius: 5rem;
+    }
+
+    & > span {
+        margin-left: 4px;
+        letter-spacing: 0;
+        font-size: 1.6rem;
+        color: var(--text-white);
+    }
+}
+
 .item {
     width: 100%;
     padding: var(--panel-gap);

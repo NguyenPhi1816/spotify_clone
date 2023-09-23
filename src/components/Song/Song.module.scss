@@ -14,7 +14,7 @@
     display: grid;
     grid-gap: 16px;
     grid-template-columns: 16px 6fr 4fr 3fr minmax(120px, 1fr);
-    border-radius: var(--border-radius);
+    border-radius: 4px;
 
     & > * {
         align-self: center;
@@ -24,7 +24,8 @@
         background-color: hsla(0, 0%, 100%, 0.1);
 
         .var1 > *a,
-        .album {
+        .album,
+        .stream-count {
             color: var(--text-white);
         }
 
@@ -54,6 +55,9 @@
 
 .var1 {
     width: 100%;
+    display: grid;
+    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: 1fr;
 
     .artists {
         & > a,
@@ -75,7 +79,8 @@
 }
 
 .name,
-.artists {
+.artists,
+.album-container {
     width: 100%;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -92,7 +97,8 @@
 .created-at,
 .duration,
 .ellipsis,
-.index {
+.index,
+.stream-count {
     font-size: 1.4rem;
     color: var(--text-grey);
 }

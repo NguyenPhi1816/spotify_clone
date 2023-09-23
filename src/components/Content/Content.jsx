@@ -7,92 +7,26 @@ import Shelf from '../Shelf';
 
 const cx = classNames.bind(styles);
 
-function Content() {
-    const [data, setData] = useState([]);
+function Content({ title, data }) {
+    const [content, setContent] = useState([]);
 
     useEffect(() => {
-        setData([
-            {
-                id: 1,
-                title: 'Danh sách phát trên Spotify',
-                items: [
-                    {
-                        id: 1,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 2,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 3,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 4,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 5,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                ],
-            },
-            {
-                id: 2,
-                title: 'Tập Trung',
-                items: [
-                    {
-                        id: 1,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 2,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 3,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 4,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                    {
-                        id: 5,
-                        image: '../src/assets/images/den_vau.jpg',
-                        title: "Today's Top Hits",
-                        desc: 'Doja Cat is on top of the Hottest 50!',
-                    },
-                ],
-            },
-        ]);
-    }, []);
+        setContent(data);
+    }, [data]);
+
+    // console.log(content);
 
     return (
         <section className={cx('section')}>
+            {title && (
+                <div className={cx('title')}>
+                    <h1>{title}</h1>
+                </div>
+            )}
             <div className={cx('container')}>
-                {data &&
-                    data.map((item) => (
-                        <Shelf key={item.id} shelfData={{ ...item }} />
+                {content &&
+                    content.map((item) => (
+                        <Shelf key={item.id} shelfData={item} />
                     ))}
             </div>
         </section>

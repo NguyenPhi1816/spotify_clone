@@ -2,67 +2,17 @@ import classNames from 'classnames/bind';
 import styles from './Categories.module.scss';
 
 import CategoryItem from '../CategoryItem';
+import { useEffect, useState } from 'react';
+import { getAllCategories } from '../../services/apiServices';
 
 const cx = classNames.bind(styles);
 
 function Categories() {
-    const CATEGORIES = [
-        {
-            id: 1,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 2,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 3,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 4,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 5,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 6,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 7,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 8,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 9,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 10,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-        {
-            id: 11,
-            title: 'Podcast',
-            thumb: '../src/assets/images/category_thumb.jpg',
-        },
-    ];
+    const [categories, setCategories] = useState([]);
+
+    useEffect(() => {
+        getAllCategories().then((res) => setCategories(res.data));
+    }, []);
 
     return (
         <div className={cx('container')}>
@@ -72,11 +22,12 @@ function Categories() {
                 </div>
                 <div className={cx('categories-container')}>
                     <ul className={cx('list')}>
-                        {CATEGORIES.map((item) => (
-                            <li key={item.id}>
-                                <CategoryItem data={item} />
-                            </li>
-                        ))}
+                        {categories &&
+                            categories.map((item) => (
+                                <li key={item.id}>
+                                    <CategoryItem data={item} />
+                                </li>
+                            ))}
                     </ul>
                 </div>
             </div>

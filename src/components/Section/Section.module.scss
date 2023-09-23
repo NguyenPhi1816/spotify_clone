@@ -1,0 +1,20 @@
+.container {
+    padding: 22px;
+    background-color: var(--background-base);
+}
+
+.title {
+    margin-bottom: 16px;
+}
+
+.list {
+    display: grid;
+    column-gap: 24px;
+    row-gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-rows: 1fr;
+
+    & > li {
+        list-style: none;
+    }
+}

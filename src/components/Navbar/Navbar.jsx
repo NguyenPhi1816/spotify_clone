@@ -35,7 +35,11 @@ function Navbar({ showSearchBar = false }) {
                 </div>
                 <div className={cx('register-login')}>
                     <div className={cx('btn')}>
-                        <Button content="Đăng ký" noBackground />
+                        <Button
+                            style={{ color: 'var(--text-grey)' }}
+                            content="Đăng ký"
+                            noBackground
+                        />
                     </div>
                     <div className={cx('btn')}>
                         <Button content="Đăng nhập" gap="32px" />

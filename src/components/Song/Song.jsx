@@ -8,7 +8,16 @@ import { Fragment } from 'react';
 
 const cx = classNames.bind(styles);
 
-const Song = ({ index, data }) => {
+const Song = ({
+    className,
+    index,
+    data,
+    showStreamCount = false,
+    showArtists = false,
+    showAlbums = false,
+    showCreatedDate = false,
+    showBlanks = false,
+}) => {
     const calculateCreatedDate = (createdDateStr) => {
         const createdDate = new Date(createdDateStr);
         const currentDate = new Date();
@@ -31,7 +40,7 @@ const Song = ({ index, data }) => {
     };
 
     return (
-        <div className={cx('container')}>
+        <div className={cx('container', className)}>
             <div className={cx('wrapper')}>
                 <div>
                     <span className={cx('index')}>{index}</span>
@@ -42,34 +51,69 @@ const Song = ({ index, data }) => {
                 <div className={cx('first')}>
                     <img
                         className={cx('thumb')}
-                        src={data.thumb}
+                        src={data.imagePath}
                         alt={data.name}
                     />
                     <div className={cx('var1')}>
                         <Link to={`/track/${data.id}`} className={cx('name')}>
                             {data.name}
                         </Link>
-                        <div className={cx('artists')}>
-                            {data.artists &&
-                                data.artists.map((artist, index) => (
-                                    <Fragment key={artist.id}>
-                                        <Link to={`/artist/${artist.id}`}>
-                                            {artist.name}
-                                        </Link>
-                                        {index < data.artists.length - 1 && (
-                                            <p>, </p>
-                                        )}
-                                    </Fragment>
-                                ))}
-                        </div>
+                        {showArtists && (
+                            <div className={cx('artists')}>
+                                {data.users &&
+                                    data.users.map((artist, index) => (
+                                        <Fragment key={artist.id}>
+                                            <Link to={`/artist/${artist.id}`}>
+                                                {artist.firstName +
+                                                    ' ' +
+                                                    artist.lastName}
+                                            </Link>
+                                            {index < data.users.length - 1 && (
+                                                <p>, </p>
+                                            )}
+                                        </Fragment>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                 </div>
-                <Link to={`/album/${data.album.id}`} className={cx('album')}>
-                    {data.album.name}
-                </Link>
-                <p className={cx('created-at')}>
-                    {calculateCreatedDate(data.createdAt)}
-                </p>
+                {showAlbums && (
+                    <div className={cx('album-container')}>
+                        {data.albums &&
+                            data.albums.map((album, index) => (
+                                <Fragment key={album.id}>
+                                    <Link
+                                        to={`/album/${album.id}`}
+                                        className={cx('album')}
+                                    >
+                                        {album.name}
+                                    </Link>
+                                    {index < data.albums.length - 1 && <p>,</p>}
+                                </Fragment>
+                            ))}
+                    </div>
+                )}
+
+                {showStreamCount && (
+                    <Fragment>
+                        <div></div>
+                        <div className={cx('stream-count')}>
+                            <p>1.000.000</p>
+                        </div>
+                    </Fragment>
+                )}
+
+                {showCreatedDate && (
+                    <p className={cx('created-at')}>
+                        {calculateCreatedDate(data.createdAt)}
+                    </p>
+                )}
+                {showBlanks && (
+                    <Fragment>
+                        <div></div>
+                        <div></div>
+                    </Fragment>
+                )}
                 <div className={cx('last')}>
                     <FavButton className={cx('fav-btn')} />
                     <p className={cx('duration')}>{data.duration}</p>

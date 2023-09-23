@@ -14,9 +14,18 @@
     }
 }
 
+.title {
+    padding: 30px 22px 16px;
+    & > h1 {
+        font-family: var(--font-family-title);
+        font-weight: 400;
+        font-size: 9.6rem;
+    }
+}
+
 .container {
     position: relative;
-    padding: 16px;
+    padding: 22px;
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;

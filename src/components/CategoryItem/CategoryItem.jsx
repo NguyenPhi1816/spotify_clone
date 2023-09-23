@@ -19,7 +19,7 @@ function CategoryItem({ data = {} }) {
     }, []);
 
     return (
-        <Link to={`/genre/${data.id}`} className={cx('link')}>
+        <Link to={`/genre/${data.id}/${data.title}`} className={cx('link')}>
             <div
                 className={cx('container')}
                 style={{ backgroundColor: randomColor }}
@@ -28,7 +28,7 @@ function CategoryItem({ data = {} }) {
                     <h4>{data.title}</h4>
                 </div>
                 <div className={cx('thumb')}>
-                    <img src={data.thumb} />
+                    <img src={data.imagePath} />
                 </div>
             </div>
         </Link>

@@ -15,19 +15,19 @@ function ShelfItem({ shelfItemData = {} }) {
     }, [shelfItemData]);
 
     return (
-        <Link to={`/playlist/${data.id}`}>
+        <Link to={`/playlist/${data.id}`} className={cx('link')}>
             <div className={cx('container')}>
                 <div className={cx('top')}>
                     <div className={cx('thumb-container')}>
-                        <img src={data.image} alt={data.title} />
+                        <img src={data.imagePath} alt={data.name} />
                     </div>
                     <div className={cx('play-btn')}>
                         <PlayButton size="48px" />
                     </div>
                 </div>
-                <div>
-                    <h3 className={cx('title')}>{data.title}</h3>
-                    <p className={cx('desc')}>{data.desc}</p>
+                <div className={cx('body')}>
+                    <h3 className={cx('title')}>{data.name}</h3>
+                    <p className={cx('desc')}>{data.description}</p>
                 </div>
             </div>
         </Link>

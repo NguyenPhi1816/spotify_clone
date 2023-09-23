@@ -32,6 +32,16 @@ function Sidebar() {
         <nav className={cx('container')}>
             <div className={cx('item', 'top')}>
                 <ul className={cx('top-list')}>
+                    <li className={cx('list-item')}>
+                        <Link to="/">
+                            <span className={cx('logo')}>
+                                <img
+                                    src={import.meta.env.VITE_LOGO_PRIMARY_URL}
+                                />
+                                <span>Spotify</span>
+                            </span>
+                        </Link>
+                    </li>
                     <li
                         className={cx('list-item', {
                             active: currentPath === '/',

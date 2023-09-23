@@ -20,17 +20,17 @@
 }
 
 @font-face {
-    font-family: 'CircularSp';
-    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2')
-        format('woff2');
-    font-weight: 700;
-}
-
-@font-face {
-    font-family: 'CircularSp';
+    font-family: 'CircularSpTitle';
     src: url('./assets/fonts/CircularSpTitle-Tall-Bold-69995af8079e90f1d15130df13ad0c60.woff2')
         format('woff2');
     font-weight: 600;
+}
+
+@font-face {
+    font-family: 'CircularSpTitle';
+    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2')
+        format('woff2');
+    font-weight: 700;
 }
 
 @font-face {
@@ -57,6 +57,7 @@
     --background-white: #ffffff;
 
     --font-family: 'CircularSp', sans-serif;
+    --font-family-title: 'CircularSpTitle', sans-serif;
 
     --panel-gap: 8px;
     --border-radius: 8px;

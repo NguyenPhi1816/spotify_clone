@@ -4,10 +4,11 @@ import classNames from 'classnames/bind';
 import styles from './Shelf.module.scss';
 
 import ShelfItem from '../ShelfItem';
+import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function Shelf({ shelfData }) {
+function Shelf({ shelfData, itemType, showAllLink = null, editShelf = false }) {
     let ref = useRef(null);
 
     const [data, setData] = useState({});
@@ -25,7 +26,15 @@ function Shelf({ shelfData }) {
         <section className={cx('container')} ref={ref}>
             <div className={cx('header')}>
                 <h2 className={cx('title')}>{data && data.title}</h2>
-                <a href={`/section/${data.id}`}>Hiện tất cả</a>
+                <Link
+                    to={
+                        showAllLink === null
+                            ? `/section/${data.id}`
+                            : showAllLink
+                    }
+                >
+                    Hiện tất cả
+                </Link>
             </div>
             <div>
                 <ul
@@ -39,7 +48,11 @@ function Shelf({ shelfData }) {
                     {data.playlists &&
                         data.playlists.map((item) => (
                             <li key={item.id} className={cx('list-item')}>
-                                <ShelfItem shelfItemData={item} />
+                                <ShelfItem
+                                    shelfItemData={item}
+                                    edit={editShelf}
+                                    type={itemType}
+                                />
                             </li>
                         ))}
                 </ul>

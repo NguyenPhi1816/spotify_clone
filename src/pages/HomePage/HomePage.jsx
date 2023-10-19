@@ -5,14 +5,18 @@ import Navbar from '../../components/Navbar';
 import Content from '../../components/Content';
 import Playbar from '../../components/Playbar';
 import { useEffect, useState } from 'react';
-import { getHomeCategory } from '../../services/apiServices';
+import { getHomeCategory } from '../../services/categoryServices';
+import { useAppContext } from '../../Context/Context';
 
 function HomePage() {
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState([]);
 
     useEffect(() => {
         getHomeCategory().then((res) => setData(res.data));
     }, []);
+
+    console.log(data);
 
     return (
         <MainLayout

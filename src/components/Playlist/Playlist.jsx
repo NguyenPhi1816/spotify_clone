@@ -7,45 +7,9 @@ import FavButton from '../FavButton';
 import Song from '../Song';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { getPlaylistById } from '../../services/apiServices';
+import { getPlaylistById } from '../../services/playlistServices';
 
 const cx = classNames.bind(styles);
-
-// const PLAYLISTS = [
-//     {
-//         id: 1,
-//         image: '../src/assets/images/den_vau.jpg',
-//         title: "Today's Top Hits",
-//         desc: 'Doja Cat is on top of the Hottest 50!',
-//         likeCount: '34.313.792',
-//         items: [
-//             {
-//                 id: 1,
-//                 thumb: '../src/assets/images/den_vau.jpg',
-//                 name: 'Đem tiền về cho mẹ',
-//                 artists: [
-//                     { id: 1, name: 'Đen Vâu' },
-//                     { id: 2, name: 'Nguyên Thảo' },
-//                 ],
-//                 album: { id: 1, name: 'Đem tiền về cho mẹ' },
-//                 createdAt: '12/21/2021 00:00:00', // MM/dd/yyyy hh:mm:ss
-//                 duration: '6:45',
-//             },
-//             {
-//                 id: 2,
-//                 thumb: '../src/assets/images/den_vau.jpg',
-//                 name: 'Nấu ăn cho em',
-//                 artists: [
-//                     { id: 1, name: 'Đen Vâu' },
-//                     { id: 3, name: 'PiaLinh' },
-//                 ],
-//                 album: { id: 2, name: 'Nấu ăn cho em' },
-//                 createdAt: '05/13/2023 00:00:00', // MM/dd/yyyy hh:mm:ss
-//                 duration: '4:01',
-//             },
-//         ],
-//     },
-// ];
 
 const Playlist = () => {
     const { id } = useParams();
@@ -56,7 +20,21 @@ const Playlist = () => {
             setData(res.data);
         });
     }, [id]);
+    const totalDuration = () => {
+        const MINUTE = 0;
+        const SECOND = 1;
+        let totalMinutes = 0;
+        let totalSeconds = 0;
+        data.songs &&
+            data.songs.map((item) => {
+                const duration = item.duration.split(':');
+                totalMinutes += Number(duration[MINUTE]);
+                totalSeconds += Number(duration[SECOND]);
+            });
 
+        totalMinutes += Math.ceil(totalSeconds / 60);
+        return totalMinutes;
+    };
     return (
         <div className={cx('container')}>
             <div
@@ -73,12 +51,20 @@ const Playlist = () => {
                     <p>{data.likedCount} lượt thích</p>
                     <span className={cx('dot')}></span>
                     <p>{data.sumSongCount} bài hát,</p>
-                    <p className={cx('duration')}>Khoảng 10 phút</p>
+                    <p className={cx('duration')}>
+                        khoảng {totalDuration()} phút
+                    </p>
                 </div>
             </div>
             <div className={cx('body')}>
                 <div className={cx('btns')}>
-                    <PlayButton className={cx('btn')} size="56px" />
+                    <PlayButton
+                        currentListPath={`/playlist/${data.id}`}
+                        currentList={data.songs}
+                        currentIndex={0}
+                        className={cx('btn')}
+                        size="56px"
+                    />
                     <FavButton className={cx('btn')} size="32px" />
                 </div>
                 <ul>
@@ -99,7 +85,8 @@ const Playlist = () => {
                         data.songs.map((item, index) => (
                             <li key={item.id}>
                                 <Song
-                                    index={index + 1}
+                                    index={index}
+                                    currentList={data.songs}
                                     data={item}
                                     showArtists
                                     showAlbums

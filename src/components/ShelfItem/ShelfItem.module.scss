@@ -64,6 +64,13 @@
     transform: translateY(15px);
     visibility: hidden;
     opacity: 0;
+
+    & > button {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        background-color: var(--background-green-base);
+    }
 }
 
 .title {

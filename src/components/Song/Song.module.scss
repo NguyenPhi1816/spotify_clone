@@ -14,10 +14,34 @@
     display: grid;
     grid-gap: 16px;
     grid-template-columns: 16px 6fr 4fr 3fr minmax(120px, 1fr);
+    grid-template-areas: 'col1 col2 col3 col4 col5';
     border-radius: 4px;
 
     & > * {
         align-self: center;
+    }
+
+    & > .col1 {
+        grid-area: col1;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    & > .col2 {
+        grid-area: col2;
+    }
+
+    & > .col3 {
+        grid-area: col3;
+    }
+
+    & > .col4 {
+        grid-area: col4;
+    }
+
+    & > .col5 {
+        grid-area: col5;
     }
 
     &:hover {
@@ -46,6 +70,12 @@
 
 .index {
     width: 16px;
+
+    & > img {
+        width: 14px;
+        height: 14px;
+        object-fit: cover;
+    }
 }
 
 .first {
@@ -120,4 +150,9 @@
 
 .icon-play {
     display: none;
+
+    .btn {
+        color: var(--text-white);
+        background-color: transparent;
+    }
 }

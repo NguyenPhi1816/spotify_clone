@@ -6,7 +6,7 @@ import Navbar from '../../components/Navbar';
 import Playbar from '../../components/Playbar';
 import Sidebar from '../../components/Sidebar';
 import MainLayout from '../../layouts/MainLayout';
-import { getCategoryChildById } from '../../services/apiServices';
+import { getCategoryChildById } from '../../services/categoryServices';
 
 const GenrePage = () => {
     const { id, title } = useParams();

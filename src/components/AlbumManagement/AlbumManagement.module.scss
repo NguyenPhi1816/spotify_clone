@@ -1,0 +1,25 @@
+.container {
+    padding: 22px;
+    background-color: var(--background-base);
+}
+
+.title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 3.2rem;
+    font-family: var(--font-family-title);
+    margin-bottom: 16px;
+}
+
+.list {
+    display: grid;
+    column-gap: 24px;
+    row-gap: 24px;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-rows: 1fr;
+
+    & > li {
+        list-style: none;
+    }
+}

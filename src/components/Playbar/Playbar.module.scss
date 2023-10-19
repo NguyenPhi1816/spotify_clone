@@ -1,3 +1,9 @@
+.wrapper {
+    a:hover {
+        text-decoration: underline;
+    }
+}
+
 .container {
     width: 100%;
     min-height: 66px;
@@ -26,4 +32,170 @@
 .btn {
     height: 48px;
     font-size: 1.6rem;
+}
+
+.playbar-auth {
+    min-height: 72px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    svg {
+        font-size: 2rem;
+    }
+
+    & > div {
+        width: 33%;
+    }
+
+    .pause,
+    .play,
+    .volume-icon {
+        display: none;
+    }
+
+    .pause,
+    .play {
+        font-size: 3.2rem;
+    }
+
+    .show {
+        display: block;
+    }
+
+    &-header {
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    &-btn {
+        margin: 0 4px;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--text-grey);
+        background-color: var(--background-black);
+    }
+
+    &-footer {
+        width: 100%;
+        display: flex;
+        align-items: center;
+
+        & > span {
+            margin: 0 4px;
+            width: 10%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+        }
+    }
+
+    &-duration {
+        flex: 1;
+        position: relative;
+        height: 12px;
+
+        & > input {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            height: 4px;
+        }
+    }
+
+    &-volume {
+        justify-content: flex-end;
+
+        .volume-icon {
+            color: #b3b3b3;
+        }
+
+        .mr8 {
+            margin-right: 8px;
+        }
+
+        .dpf-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        &-bar {
+            position: relative;
+            width: 93px;
+            height: 12px;
+
+            & > input {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 100%;
+                height: 4px;
+            }
+        }
+    }
+
+    &-current-album {
+        padding: 0 8px;
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+
+        & > a > img {
+            width: 56px;
+            height: 56px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        & > div {
+            padding: 0 14px;
+            letter-spacing: normal;
+
+            & > * {
+                -webkit-line-clamp: 1;
+                -webkit-box-orient: vertical;
+                display: -webkit-box;
+                white-space: unset;
+                word-break: break-all;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            & > h4 {
+                font-size: 1.4rem;
+            }
+
+            .links {
+                padding: 0;
+
+                & > a {
+                    font-size: 1.1rem;
+                    color: var(--text-grey);
+                }
+            }
+        }
+
+        .like-btn {
+            width: 32px;
+            height: 32px;
+            font-size: 3.2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    }
+}
+
+.active {
+    color: var(--background-green-base);
 }

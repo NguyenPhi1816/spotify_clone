@@ -1,7 +1,7 @@
 import classNames from 'classnames/bind';
 import styles from './Sidebar.module.scss';
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 import Button from '../Button';
@@ -17,12 +17,17 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import HeadlessTippy from '../HeadlessTippy';
+import NotAuthenticatedUser from '../SidebarList/NotAuthenticatedUser';
+import AuthenticatedUser from '../SidebarList/AuthenticatedUser';
+import { useAppContext } from '../../Context/Context';
 
 const cx = classNames.bind(styles);
 
 function Sidebar() {
     const location = useLocation();
     const currentPath = location.pathname;
+
+    const { state } = useAppContext();
 
     const [show, setShow] = useState(false);
 
@@ -116,14 +121,14 @@ function Sidebar() {
                                 }
                                 show={show}
                                 setShow={setShow}
-                                referenceClientRect={{
-                                    width: 100,
+                                getReferenceClientRect={() => ({
+                                    width: 130,
                                     height: 100,
                                     left: 378,
                                     right: 0,
-                                    top: 70,
+                                    top: 100,
                                     bottom: 0,
-                                }}
+                                })}
                             >
                                 <div
                                     className={cx('plus', 'icon')}
@@ -136,36 +141,11 @@ function Sidebar() {
                     </div>
 
                     <div className={cx('body-list')}>
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Tạo danh sách phát đầu tiên của bạn
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Rất dễ! Chúng tôi sẽ giúp bạn
-                            </p>
-                            <div className="btn">
-                                <Button
-                                    content="Tạo danh sách phát"
-                                    customFontSize="14px"
-                                />
-                            </div>
-                        </div>
-
-                        <div className={cx('article')}>
-                            <h4 className={cx('acticle-title')}>
-                                Hãy cùng tìm và theo dõi một số podcast
-                            </h4>
-                            <p className={cx('acticle-content')}>
-                                Chúng tôi sẽ cập nhật thông tin cho bạn về các
-                                tập mới
-                            </p>
-                            <div className="btn">
-                                <Button
-                                    content="Duyệt xem Podcast"
-                                    customFontSize="14px"
-                                />
-                            </div>
-                        </div>
+                        {!state.isAuthenticated ? (
+                            <NotAuthenticatedUser />
+                        ) : (
+                            <AuthenticatedUser />
+                        )}
                     </div>
                 </div>
             </div>

@@ -26,7 +26,11 @@ function Content({ title, data }) {
             <div className={cx('container')}>
                 {content &&
                     content.map((item) => (
-                        <Shelf key={item.id} shelfData={item} />
+                        <Shelf
+                            key={item.id}
+                            shelfData={item}
+                            itemType="playlist"
+                        />
                     ))}
             </div>
         </section>

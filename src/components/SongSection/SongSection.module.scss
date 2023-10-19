@@ -2,6 +2,10 @@
     background-color: var(--background-base);
 }
 
+.link:hover {
+    text-decoration: underline;
+}
+
 .header {
     position: relative;
     padding: 0 20px 20px;
@@ -104,6 +108,26 @@
 
         & > .btn {
             margin-right: 10px;
+        }
+    }
+
+    .lyric-artist {
+        display: flex;
+        align-items: flex-start;
+
+        & > div {
+            width: 50%;
+        }
+    }
+
+    .lyrics-container {
+        display: flex;
+        flex-direction: column;
+        letter-spacing: normal;
+
+        & > h3 {
+            font-size: 2.4rem;
+            margin-bottom: 16px;
         }
     }
 

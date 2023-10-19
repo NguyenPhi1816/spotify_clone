@@ -1,0 +1,42 @@
+.container {
+    padding: 8px;
+    display: flex;
+    border-radius: var(--border-radius);
+
+    &:hover {
+        background-color: var(--background-grey);
+    }
+
+    .thumb {
+        margin-right: 10px;
+        width: 48px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 4px;
+    }
+
+    .info > * {
+        width: 100%;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        display: -webkit-box;
+        white-space: unset;
+        word-break: break-all;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .footer {
+        color: var(--text-grey);
+        font-size: 1.4rem;
+
+        .dot {
+            display: inline-block;
+            margin: 0 4px;
+            width: 4px;
+            height: 4px;
+            border-radius: 5rem;
+            background-color: var(--text-grey);
+        }
+    }
+}

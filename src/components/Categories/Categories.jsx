@@ -3,7 +3,7 @@ import styles from './Categories.module.scss';
 
 import CategoryItem from '../CategoryItem';
 import { useEffect, useState } from 'react';
-import { getAllCategories } from '../../services/apiServices';
+import { getAllCategories } from '../../services/categoryServices';
 
 const cx = classNames.bind(styles);
 

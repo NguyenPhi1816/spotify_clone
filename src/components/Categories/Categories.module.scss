@@ -1,4 +1,6 @@
 .container {
+    min-height: calc(100vh - 64px - 72px - 8px);
+    position: relative;
     padding: 24px;
     background-color: var(--background-base);
 }

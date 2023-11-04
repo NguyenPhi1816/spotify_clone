@@ -152,25 +152,48 @@
     }
 
     .artist-container {
-        margin-top: 24px;
-        padding: 8px;
+        padding: 0 16px;
         display: flex;
-        justify-content: flex-start;
-        align-items: center;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-start;
 
-        & > img {
-            margin-right: 16px;
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5rem;
+        &-header {
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+
+            & > h3 {
+                font-size: 2.4rem;
+            }
         }
 
-        & > div {
-            letter-spacing: normal;
-            font-weight: 700;
-            & > p {
-                font-size: 1.4rem;
+        & > ul {
+            & > li {
+                list-style: none;
+            }
+        }
+
+        .artist {
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+
+            &-img {
+                margin-right: 16px;
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 5rem;
+            }
+
+            &-info {
+                letter-spacing: normal;
+                font-weight: 700;
+                & > p {
+                    font-size: 1.4rem;
+                }
             }
         }
     }

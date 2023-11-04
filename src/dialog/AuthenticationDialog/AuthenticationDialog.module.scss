@@ -1,0 +1,43 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9998;
+    background-color: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.activation-trigger {
+    padding: 16px;
+    max-width: 600px;
+    background-color: #2e77d0;
+    border-radius: var(--border-radius);
+    z-index: 9999;
+
+    .header {
+        display: flex;
+        justify-content: flex-end;
+
+        & > button {
+            padding: 5px;
+            color: var(--text-white);
+        }
+    }
+
+    & > p {
+        font-size: 1.8rem;
+        font-weight: 700;
+        letter-spacing: normal;
+    }
+
+    .register-login {
+        margin-top: 16px;
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+    }
+}

@@ -1,4 +1,5 @@
 .section {
+    position: relative;
     height: 100vh;
     background-color: var(--background-white);
 }
@@ -149,6 +150,11 @@
                     outline: none;
                     border: none;
                     border-radius: 5rem;
+
+                    &:disabled {
+                        color: var(--text-black);
+                        opacity: 0.6;
+                    }
                 }
 
                 .password {
@@ -170,6 +176,23 @@
 
                 .show {
                     display: block;
+                }
+
+                .name {
+                    display: grid;
+                    grid-template-columns: 70% 30%;
+                    grid-template-rows: 1fr;
+                    column-gap: 4px;
+                }
+
+                .error-input {
+                    border: 1px solid red !important;
+                }
+
+                .error-message {
+                    margin-top: 4px;
+                    font-size: 1.2rem;
+                    color: red;
                 }
             }
         }

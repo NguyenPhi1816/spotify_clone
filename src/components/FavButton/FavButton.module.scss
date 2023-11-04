@@ -7,10 +7,15 @@
 
         & > svg {
             color: var(--text-white);
+            transition: all 0.2s ease-in-out;
         }
     }
 
     & > svg {
         color: var(--text-grey);
     }
+}
+
+.active {
+    color: var(--background-green-base) !important;
 }

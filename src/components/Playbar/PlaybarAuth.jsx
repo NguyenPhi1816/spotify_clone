@@ -73,11 +73,16 @@ const PlaybarAuth = () => {
     };
 
     const handleDurationChange = (e) => {
+        e.stopPropagation();
         const _durationValue = e.target.value;
+
         if (currentPlayingSong !== null) {
             setDurationValue(_durationValue);
-            currentPlayingSong.currentTime =
-                currentPlayingSong.duration * _durationValue;
+            const time = currentPlayingSong.duration * _durationValue;
+            currentPlayingSong.pause();
+            currentPlayingSong.currentTime = time;
+            currentPlayingSong.play();
+            console.log(currentPlayingSong.currentTime);
         }
     };
 
@@ -103,15 +108,9 @@ const PlaybarAuth = () => {
         } else if (currentPlayingSongIndex + 1 < currentPlayingList.length) {
             dispatch({ type: type.PAUSE_SONG });
             dispatch({ type: type.NEXT_SONG });
-            setTimeout(() => {
-                dispatch({ type: type.PLAY_SONG });
-            }, 1000);
         } else if (isLoop) {
             dispatch({ type: type.PAUSE_SONG });
             dispatch({ type: type.SET_CURRENT_SONG_INDEX, index: 0 });
-            setTimeout(() => {
-                dispatch({ type: type.PLAY_SONG });
-            }, 1000);
         }
     };
 
@@ -124,15 +123,9 @@ const PlaybarAuth = () => {
                 type: type.SET_CURRENT_SONG_INDEX,
                 index: currentPlayingList.length - 1,
             });
-            setTimeout(() => {
-                dispatch({ type: type.PLAY_SONG });
-            }, 1000);
         } else if (currentPlayingSongIndex - 1 >= 0) {
             dispatch({ type: type.PAUSE_SONG });
             dispatch({ type: type.PREV_SONG });
-            setTimeout(() => {
-                dispatch({ type: type.PLAY_SONG });
-            }, 1000);
         }
     };
 
@@ -155,7 +148,29 @@ const PlaybarAuth = () => {
     }, [currentPlayingSong, volumeValue]);
 
     useEffect(() => {
+        let song = null;
         let isChanged = false;
+        let isCanPlayThrough = false;
+
+        const handlePlaySong = (song) => {
+            song.id = Math.random();
+            dispatch({
+                type: type.SET_SONG,
+                songId: state.currentPlayingList[state.currentPlayingSongIndex]
+                    .id,
+                currentPlayingSong: song,
+            });
+            setCurrentPlayingSong(song);
+            setTimeout(() => {
+                dispatch({ type: type.PLAY_SONG });
+            }, 1000);
+        };
+
+        const handleCanPlayThrough = () => {
+            isCanPlayThrough = true;
+            handlePlaySong(song);
+        };
+
         if (
             state.currentPlayingPath !== null &&
             currentPlayingPath !== state.currentPlayingPath
@@ -189,15 +204,21 @@ const PlaybarAuth = () => {
             const audioPath =
                 state.currentPlayingList[state.currentPlayingSongIndex]
                     .audioPath;
-            const song = new Audio(audioPath);
-            dispatch({
-                type: type.SET_SONG,
-                songId: state.currentPlayingList[state.currentPlayingSongIndex]
-                    .id,
-                currentPlayingSong: song,
-            });
-            setCurrentPlayingSong(song);
+            song = new Audio(audioPath);
         }
+
+        if (song !== null && !isCanPlayThrough)
+            song.addEventListener('canplaythrough', handleCanPlayThrough);
+
+        return () => {
+            if (song !== null) {
+                console.log('remove');
+                song.removeEventListener(
+                    'canplaythrough',
+                    handleCanPlayThrough,
+                );
+            }
+        };
     }, [
         state.currentPlayingPath,
         state.currentPlayingList,
@@ -215,12 +236,12 @@ const PlaybarAuth = () => {
     }, [state.isPlaying]);
 
     useEffect(() => {
-        if (currentPlayingSong !== null)
-            setDurationValue(
-                (
-                    currentPlayingSong.currentTime / currentPlayingSong.duration
-                ).toFixed(2),
-            );
+        if (currentPlayingSong !== null) {
+            const p = (
+                currentPlayingSong.currentTime / currentPlayingSong.duration
+            ).toFixed(2);
+            setDurationValue(p);
+        }
     });
 
     useEffect(() => {

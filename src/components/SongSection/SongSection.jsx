@@ -10,10 +10,16 @@ import Button from '../Button';
 import Song from '../Song';
 import Shelf from '../Shelf';
 import { useRef } from 'react';
-import { useAppContext } from '../../Context/Context';
+import { type, useAppContext } from '../../Context/Context';
 import { getAlbumById } from '../../services/albumServices';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import Comments from '../Comments';
+import Loading from '../Loading';
+import {
+    addSongToFavPlaylist,
+    removeSongFromFavPlaylist,
+} from '../../services/playlistServices';
+import ShelfItem from '../ShelfItem';
 
 const cx = classNames.bind(styles);
 
@@ -21,10 +27,9 @@ const SongSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
-    const { state } = useAppContext();
-
     const { id } = useParams();
     const lyricContainerRef = useRef();
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [albums, setAlbums] = useState([]);
     const [songs, setSongs] = useState([]);
@@ -33,12 +38,17 @@ const SongSection = () => {
     const [mainAlbumDetail, setMainAlbumDetail] = useState({});
     const [numberOfSongs, setNumberOfSongs] = useState(5);
     const [isShowMore, setIsShowMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isFavSong, setIsFavSong] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         getSongById(id).then((res) => {
             setData(res.data);
             setMainArtist(res.data.users[0]);
             setMainAlbum(res.data.albums[0]);
+            setIsLoading(false);
         });
     }, [id]);
 
@@ -71,9 +81,77 @@ const SongSection = () => {
         } else setNumberOfSongs(HIDDEN_SONG_NUMBERS);
     }, [isShowMore]);
 
+    useEffect(() => {
+        if (state.likedSongsPlaylist.songs) {
+            const [song] = state.likedSongsPlaylist.songs.filter(
+                (item) => item.id == id,
+            );
+            if (!!song) {
+                setIsFavSong(true);
+            }
+        }
+    }, [state.likedSongsPlaylist]);
+
+    const handleLikeSong = () => {
+        if (!isFavSong) {
+            addSongToFavPlaylist(state.authData.user.id, id).then((res) => {
+                dispatch({
+                    type: type.SET_LIKED_SONGS_PLAYLIST,
+                    playlist: res.data,
+                });
+                setIsFavSong(true);
+            });
+        } else {
+            removeSongFromFavPlaylist(state.authData.user.id, id).then(
+                (res) => {
+                    if (res.status == 200 && state.likedSongsPlaylist.songs) {
+                        const new_songs = state.likedSongsPlaylist.songs.filter(
+                            (item) => item.id != id,
+                        );
+                        const new_playlist = {
+                            ...state.likedSongsPlaylist,
+                            songs: new_songs,
+                        };
+                        dispatch({
+                            type: type.SET_LIKED_SONGS_PLAYLIST,
+                            playlist: new_playlist,
+                        });
+                        setIsFavSong(false);
+                    }
+                },
+            );
+        }
+    };
+
     const handleShowMore = () => {
         setIsShowMore((prev) => !prev);
     };
+
+    const handlePlayList = () => {
+        if (state.currentPlayingPath !== location.pathname) {
+            console.log('load');
+            dispatch({
+                type: type.LOAD_SONG,
+                currentPlayingPath: location.pathname,
+                currentPlayingList: [data],
+                currentPlayingSongIndex: 0,
+            });
+        } else {
+            if (!state.isPlaying) {
+                dispatch({ type: type.PLAY_SONG });
+            } else {
+                dispatch({ type: type.PAUSE_SONG });
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (state.currentPlayingPath === location.pathname) {
+            setIsPlaying(state.isPlaying);
+        } else {
+            setIsPlaying(false);
+        }
+    });
 
     return (
         <div className={cx('container')}>
@@ -114,7 +192,7 @@ const SongSection = () => {
                             <span className={cx('dot')}></span>
                             <p>
                                 {data.releaseDate &&
-                                    data.releaseDate.substring(6, 11)}
+                                    data.releaseDate.substring(7, 11)}
                             </p>
                             <span className={cx('dot')}></span>
                             <p>{data.duration}</p>
@@ -133,15 +211,17 @@ const SongSection = () => {
                 ></div>
                 <div className={cx('btns')}>
                     <PlayButton
-                        currentListPath={`/album/${
-                            data.albums && data.albums[0].id
-                        }`}
-                        currentList={[data]}
-                        currentIndex={0}
+                        isPlaying={isPlaying}
+                        onClick={(e) => handlePlayList(e)}
                         className={cx('btn')}
                         size="56px"
                     />
-                    <FavButton className={cx('btn')} size="32px" />
+                    <FavButton
+                        onClick={handleLikeSong}
+                        isActive={isFavSong}
+                        className={cx('btn')}
+                        size="32px"
+                    />
                 </div>
                 <div
                     className={cx('lyric-artist')}
@@ -180,19 +260,32 @@ const SongSection = () => {
                         )}
                     </div>
                     <div className={cx('artist-container')}>
-                        <img
-                            src={mainArtist.photoImagePath}
-                            alt={mainArtist.fullName}
-                        />
-                        <div>
-                            <p>Nghệ sĩ</p>
-                            <Link
-                                className={cx('link')}
-                                to={`/artist/${mainArtist.id}`}
-                            >
-                                {mainArtist.fullName}
-                            </Link>
+                        <div className={cx('artist-container-header')}>
+                            <h3>Nghệ sĩ</h3>
                         </div>
+                        <ul>
+                            {data.users &&
+                                data.users.map((user) => (
+                                    <li key={user.id}>
+                                        <div className={cx('artist')}>
+                                            <img
+                                                className={cx('artist-img')}
+                                                src={user.photoImagePath}
+                                                alt={user.fullName}
+                                            />
+                                            <div className={cx('artist-info')}>
+                                                <p>Nghệ sĩ</p>
+                                                <Link
+                                                    className={cx('link')}
+                                                    to={`/artist/${user.id}`}
+                                                >
+                                                    {user.fullName}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </li>
+                                ))}
+                        </ul>
                     </div>
                 </div>
                 <div className={cx('song-container')}>
@@ -237,15 +330,21 @@ const SongSection = () => {
                 </div>
                 <div className={cx('artist-album-container')}>
                     <Shelf
-                        shelfData={{
-                            title: `Các bản phát thịnh hành của ${
-                                mainArtist && mainArtist.fullName
-                            }`,
-                            playlists: albums,
-                        }}
-                        itemType="album"
-                        showAllLink={`/artist/${mainArtist.id}/album`}
-                    />
+                        title={`Các bản phát thịnh hành của ${
+                            mainArtist && mainArtist.fullName
+                        }`}
+                        to={`/artist/${mainArtist.id}/album`}
+                    >
+                        {albums.map((item) => (
+                            <li key={item.id}>
+                                <ShelfItem
+                                    shelfItemData={item}
+                                    edit={false}
+                                    type="album"
+                                />
+                            </li>
+                        ))}
+                    </Shelf>
                 </div>
                 <div className={cx('album-container')}>
                     <div className={cx('album-container-header')}>
@@ -286,11 +385,12 @@ const SongSection = () => {
                         </ul>
                     </div>
                 </div>
-                <Comments />
+                <Comments data={data.reviews} songId={id} />
                 <div className={cx('created-date')}>
                     <p>4 tháng 8, 2023</p>
                 </div>
             </div>
+            {isLoading && <Loading isFitMainLayoutContent />}
         </div>
     );
 };

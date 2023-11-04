@@ -4,6 +4,8 @@ import classNames from 'classnames/bind';
 import styles from './Content.module.scss';
 
 import Shelf from '../Shelf';
+import Loading from '../Loading';
+import ShelfItem from '../ShelfItem';
 
 const cx = classNames.bind(styles);
 
@@ -13,8 +15,6 @@ function Content({ title, data }) {
     useEffect(() => {
         setContent(data);
     }, [data]);
-
-    // console.log(content);
 
     return (
         <section className={cx('section')}>
@@ -28,9 +28,19 @@ function Content({ title, data }) {
                     content.map((item) => (
                         <Shelf
                             key={item.id}
-                            shelfData={item}
-                            itemType="playlist"
-                        />
+                            title={item.title}
+                            to={`/section/${item.id}`}
+                        >
+                            {item.playlists.map((playlist) => (
+                                <li key={playlist.id}>
+                                    <ShelfItem
+                                        shelfItemData={playlist}
+                                        edit={false}
+                                        type="playlist"
+                                    />
+                                </li>
+                            ))}
+                        </Shelf>
                     ))}
             </div>
         </section>

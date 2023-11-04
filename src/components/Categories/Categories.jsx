@@ -4,14 +4,20 @@ import styles from './Categories.module.scss';
 import CategoryItem from '../CategoryItem';
 import { useEffect, useState } from 'react';
 import { getAllCategories } from '../../services/categoryServices';
+import Loading from '../Loading';
 
 const cx = classNames.bind(styles);
 
 function Categories() {
     const [categories, setCategories] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        getAllCategories().then((res) => setCategories(res.data));
+        setIsLoading(true);
+        getAllCategories().then((res) => {
+            setCategories(res.data);
+            setIsLoading(false);
+        });
     }, []);
 
     return (
@@ -31,6 +37,7 @@ function Categories() {
                     </ul>
                 </div>
             </div>
+            {isLoading && <Loading />}
         </div>
     );
 }

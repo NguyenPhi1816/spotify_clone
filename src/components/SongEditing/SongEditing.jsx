@@ -3,7 +3,12 @@ import styles from './SongEditing.module.scss';
 import { Link, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { getSongById } from '../../services/songServices';
+import {
+    getSongById,
+    uploadSong,
+    uploadSongAudio,
+    uploadSongImage,
+} from '../../services/songServices';
 import { useRef } from 'react';
 import { useAppContext } from '../../Context/Context';
 import HeadlessTippy from '../HeadlessTippy';
@@ -12,6 +17,10 @@ import ImageUploadModal from '../ImageUploadModal';
 import ConfirmationDialog from '../../dialog/ConfirmationDialog';
 import AudioUploadModal from '../AudioUploadModal';
 import TextEditor from '../TextEditor';
+import Loading from '../Loading';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPencil } from '@fortawesome/free-solid-svg-icons';
+import AddArtistToSong from '../AddArtistToSong/AddArtistToSong';
 
 const cx = classNames.bind(styles);
 
@@ -31,6 +40,8 @@ const SongEditing = () => {
     const [showUploadAudioModal, setShowUploadAudioModal] = useState(false);
     const [lyrics, setLyrics] = useState('');
     const [showLyricsEditor, setShowLyricsEditor] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEditArtist, setIsEditArtist] = useState(false);
 
     const handleShowTippy = () => setShowTippy((prev) => !prev);
 
@@ -48,29 +59,70 @@ const SongEditing = () => {
     };
 
     const handleChangeImage = (file) => {
-        console.log(file.name);
+        uploadSongImage(id, file).then((res) => setData(res.data));
         setShowUploadImageModal(false);
     };
 
     const handleChangeAudio = (file) => {
-        console.log(file.name);
+        uploadSongAudio(id, file).then((res) => setData(res.data));
         setShowUploadAudioModal(false);
     };
 
+    const dateExtractor = (date) => {
+        const [a, datePart, b] = data.releaseDate.split(' ');
+        const [month, day, year] = datePart.split('/');
+        return [month, day, year];
+    };
+
+    const convertToSecond = (durationStr) => {
+        const [min, sec] = durationStr.split(':');
+        const duration = Number.parseInt(min) * 60 + Number.parseInt(sec);
+        return duration;
+    };
+
     const handleChangeTitle = () => {
-        console.log(title);
+        const [month, day, year] = dateExtractor(data.releaseDate);
+        const duration = convertToSecond(data.duration);
+        uploadSong(
+            id,
+            title,
+            data.genre,
+            duration,
+            data.lyric,
+            Number.parseInt(day),
+            Number.parseInt(month),
+            Number.parseInt(year),
+            data.label,
+            state.authData.user.id,
+        ).then((res) => setData(res.data));
     };
 
     const handleChangeLyrics = () => {
-        console.log(lyrics);
+        const [month, day, year] = dateExtractor(data.releaseDate);
+        const duration = convertToSecond(data.duration);
+        uploadSong(
+            id,
+            data.name,
+            data.genre,
+            duration,
+            lyrics,
+            Number.parseInt(day),
+            Number.parseInt(month),
+            Number.parseInt(year),
+            data.label,
+            state.authData.user.id,
+        ).then((res) => setData(res.data));
+        setShowLyricsEditor(false);
     };
 
     useEffect(() => {
+        setIsLoading(true);
         getSongById(id).then((res) => {
             setData(res.data);
             setMainArtist(res.data.users[0]);
             setMainAlbum(res.data.albums[0]);
             setLyrics(res.data.lyric);
+            setIsLoading(false);
         });
     }, [id]);
 
@@ -188,7 +240,7 @@ const SongEditing = () => {
                             <span className={cx('dot')}></span>
                             <p>
                                 {data.releaseDate &&
-                                    data.releaseDate.substring(6, 11)}
+                                    data.releaseDate.substring(7, 11)}
                             </p>
                             <span className={cx('dot')}></span>
                             <p>{data.duration}</p>
@@ -210,6 +262,40 @@ const SongEditing = () => {
                         className={cx('lyrics-container')}
                         ref={lyricContainerRef}
                     ></div>
+                    <div className={cx('artist-container')}>
+                        <div className={cx('artist-container-header')}>
+                            <h3>Nghệ sĩ</h3>{' '}
+                            <Button
+                                onClick={() => setIsEditArtist(true)}
+                                className={cx('pencil')}
+                                noBackground
+                                content={<FontAwesomeIcon icon={faPencil} />}
+                            />
+                        </div>
+                        <ul>
+                            {data.users &&
+                                data.users.map((user) => (
+                                    <li key={user.id}>
+                                        <div className={cx('artist')}>
+                                            <img
+                                                className={cx('artist-img')}
+                                                src={user.photoImagePath}
+                                                alt={user.fullName}
+                                            />
+                                            <div className={cx('artist-info')}>
+                                                <p>Nghệ sĩ</p>
+                                                <Link
+                                                    className={cx('link')}
+                                                    to={`/artist/${user.id}`}
+                                                >
+                                                    {user.fullName}
+                                                </Link>
+                                            </div>
+                                        </div>
+                                    </li>
+                                ))}
+                        </ul>
+                    </div>
                 </div>
                 <div className={cx('audio-container')}>
                     <h3>Tệp âm thanh</h3>
@@ -252,6 +338,17 @@ const SongEditing = () => {
                     setValue={setLyrics}
                     onClose={handleShowLyricsEditor}
                     onSave={handleChangeLyrics}
+                />
+            )}
+            {isLoading && <Loading isFitDashboardLayoutContent />}
+            {isEditArtist && (
+                <AddArtistToSong
+                    songId={id}
+                    onClose={() => setIsEditArtist(false)}
+                    onChange={(artists) => {
+                        const newData = { ...data, users: artists };
+                        setData(newData);
+                    }}
                 />
             )}
         </div>

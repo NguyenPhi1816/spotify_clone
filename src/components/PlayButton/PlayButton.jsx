@@ -5,70 +5,43 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 import { type, useAppContext } from '../../Context/Context';
 import React, { useEffect, useState } from 'react';
+import AuthenticationDialog from '../../dialog/AuthenticationDialog';
 
 const cx = classNames.bind(styles);
 
-const PlayButton = React.forwardRef(
-    (
-        {
-            currentListPath,
-            currentList,
-            currentIndex,
-            className,
-            noBackground = false,
-            size = '16px',
-        },
-        ref,
-    ) => {
-        const { state, dispatch } = useAppContext();
-        const [isPlaying, setIsPlaying] = useState(false);
+export const types = { SONG: 'SONG', LIST: 'LIST', CARD: 'CARD' };
 
-        const handlePlayingAlbum = () => {
-            if (
-                state.currentPlayingPath !== currentListPath ||
-                state.currentPlayingSongIndex !== currentIndex
-            ) {
-                dispatch({
-                    type: type.LOAD_SONG,
-                    currentPlayingPath: currentListPath,
-                    currentPlayingList: currentList,
-                    currentPlayingSongIndex: currentIndex,
-                });
-                setTimeout(() => {
-                    dispatch({ type: type.PLAY_SONG });
-                    setIsPlaying(!state.isPlaying);
-                }, 1000);
-            } else {
-                if (!state.isPlaying) {
-                    dispatch({ type: type.PLAY_SONG });
-                } else {
-                    dispatch({ type: type.PAUSE_SONG });
-                }
-            }
-        };
+const PlayButton = ({
+    isPlaying,
+    onClick,
+    className,
+    noBackground = false,
+    size = '16px',
+}) => {
+    const { state } = useAppContext();
+    const [showDialog, setShowDialog] = useState(false);
 
-        useEffect(() => {
-            if (
-                state.currentPlayingPath === currentListPath &&
-                state.currentPlayingSongIndex === currentIndex
-            ) {
-                setIsPlaying(state.isPlaying);
-            } else if (state.currentPlayingSongIndex === currentIndex) {
-                setIsPlaying(state.isPlaying);
-            }
-        }, [state.isPlaying]);
+    const handleClick = (e) => {
+        e.preventDefault();
 
-        return (
+        if (state.authData !== null) {
+            onClick();
+        } else {
+            setShowDialog(true);
+        }
+    };
+
+    return (
+        <>
             <div
                 className={cx('play-btn', className)}
                 style={{
                     width: size,
                     height: size,
                 }}
-                onClick={handlePlayingAlbum}
+                onClick={(e) => handleClick(e)}
             >
                 <button
-                    ref={ref}
                     style={{
                         fontSize: size === '16px' && '16px',
                         backgroundColor: noBackground && 'transparent',
@@ -85,8 +58,14 @@ const PlayButton = React.forwardRef(
                     />
                 </button>
             </div>
-        );
-    },
-);
+            {showDialog && (
+                <AuthenticationDialog
+                    message={'Vui lòng đăng nhập để tận hưởng bài hát bạn nhé.'}
+                    onClose={() => setShowDialog(false)}
+                />
+            )}
+        </>
+    );
+};
 
 export default PlayButton;

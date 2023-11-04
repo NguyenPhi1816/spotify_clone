@@ -7,6 +7,9 @@ import { getAlbumsSongsByUserId } from '../../services/userServices';
 import Button from '../Button';
 import AlbumSongModal from '../AlbumSongModal';
 import AddAlbumModal from '../AddAlbumModal';
+import Loading from '../Loading';
+import { createAlbum, getAlbumById } from '../../services/albumServices';
+import { useAppContext } from '../../Context/Context';
 
 const cx = classNames.bind(styles);
 
@@ -15,19 +18,28 @@ const AlbumManagement = () => {
     const [data, setData] = useState([]);
     const [showAddAlbumModal, setShowAddAlbumModal] = useState(false);
     const [showAddSongModal, setShowAddSongModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [newAlbumId, setNewAlbumId] = useState(null);
 
     const handleShowAddAlbumModal = () => {
         setShowAddAlbumModal((prev) => !prev);
     };
 
-    const handleSaveAlbum = () => {
-        console.log('album saved!');
+    const handleSaveAlbum = async (value) => {
+        const albumId = await createAlbum(id, value).then((res) => res.data);
+        const album = await getAlbumById(albumId).then((res) => res.data);
+        data.push(album);
+        setNewAlbumId(albumId);
         setShowAddAlbumModal(false);
         setShowAddSongModal(true);
     };
 
     useEffect(() => {
-        getAlbumsSongsByUserId(id).then((res) => setData(res.data.albums));
+        setIsLoading(true);
+        getAlbumsSongsByUserId(id).then((res) => {
+            setData(res.data.albums);
+            setIsLoading(false);
+        });
     }, [id]);
 
     return (
@@ -60,8 +72,13 @@ const AlbumManagement = () => {
                 />
             )}
             {showAddSongModal && (
-                <AlbumSongModal onClose={() => setShowAddSongModal(false)} />
+                <AlbumSongModal
+                    userId={id}
+                    albumId={newAlbumId}
+                    onClose={() => setShowAddSongModal(false)}
+                />
             )}
+            {isLoading && <Loading />}
         </section>
     );
 };

@@ -2,21 +2,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import classNames from 'classnames/bind';
 import styles from './Shelf.module.scss';
-
-import ShelfItem from '../ShelfItem';
 import { Link } from 'react-router-dom';
 
 const cx = classNames.bind(styles);
 
-function Shelf({ shelfData, itemType, showAllLink = null, editShelf = false }) {
+function Shelf({ title, to = null, children }) {
     let ref = useRef(null);
-
-    const [data, setData] = useState({});
     const [containerWidth, setContainerWidth] = useState(0);
-
-    useEffect(() => {
-        setData({ ...shelfData });
-    }, [shelfData]);
 
     useLayoutEffect(() => {
         setContainerWidth(ref.current.offsetWidth);
@@ -25,16 +17,8 @@ function Shelf({ shelfData, itemType, showAllLink = null, editShelf = false }) {
     return (
         <section className={cx('container')} ref={ref}>
             <div className={cx('header')}>
-                <h2 className={cx('title')}>{data && data.title}</h2>
-                <Link
-                    to={
-                        showAllLink === null
-                            ? `/section/${data.id}`
-                            : showAllLink
-                    }
-                >
-                    Hiện tất cả
-                </Link>
+                <h2 className={cx('title')}>{title}</h2>
+                {to !== null && <Link to={to}>Hiện tất cả</Link>}
             </div>
             <div>
                 <ul
@@ -45,16 +29,7 @@ function Shelf({ shelfData, itemType, showAllLink = null, editShelf = false }) {
                         )}, 1fr)`,
                     }}
                 >
-                    {data.playlists &&
-                        data.playlists.map((item) => (
-                            <li key={item.id} className={cx('list-item')}>
-                                <ShelfItem
-                                    shelfItemData={item}
-                                    edit={editShelf}
-                                    type={itemType}
-                                />
-                            </li>
-                        ))}
+                    {children}
                 </ul>
             </div>
         </section>

@@ -6,26 +6,72 @@ import SidebarListItem from '../SidebarListItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { useAppContext } from '../../Context/Context';
+import { type, useAppContext } from '../../Context/Context';
 import { getFollowingPlaylist } from '../../services/userServices';
+import Loading from '../Loading';
+import { getPlaylistById } from '../../services/playlistServices';
 
 const cx = classNames.bind(styles);
 
 const AuthenticatedUser = () => {
     const PLAYLIST = 'playlist';
     const ARTIST = 'artist';
+    const LIKED_SONGS_PLAYLIST_NAME = 'Liked Songs';
 
-    const { state } = useAppContext();
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
-
-    useEffect(() => {
-        getFollowingPlaylist(state.authData.user.id).then((res) =>
-            setData(res.data),
-        );
-    }, [state.authData.user.id]);
-
+    const [isLoading, setIsLoading] = useState(false);
     const [activeBtn, setActiveBtn] = useState(null);
     const [searchValue, setSearchValue] = useState('');
+    const [likedSongsPlaylist, setLikedSongsPlaylist] = useState({});
+
+    useEffect(() => {
+        setIsLoading(true);
+        getFollowingPlaylist(state.authData.user.id).then((res) => {
+            setData(res.data);
+
+            dispatch({
+                type: type.SET_FAV_PLAYLISTS,
+                playlists: res.data.playlists,
+            });
+            dispatch({
+                type: type.SET_FAV_ARTISTS,
+                artists: res.data.followings,
+            });
+
+            const [_likedSongPlaylist] = res.data.playlists.filter(
+                (item) => item.name === LIKED_SONGS_PLAYLIST_NAME,
+            );
+
+            if (_likedSongPlaylist) setLikedSongsPlaylist(_likedSongPlaylist);
+
+            setIsLoading(false);
+        });
+    }, [state.authData.user.id]);
+
+    useEffect(() => {
+        setData((prev) => ({
+            followings: prev.followings,
+            playlists: state.favPlaylists,
+        }));
+    }, [state.favPlaylists]);
+
+    useEffect(() => {
+        setData((prev) => ({
+            followings: state.favArtists,
+            playlists: prev.playlists,
+        }));
+    }, [state.favArtists]);
+
+    useEffect(() => {
+        if (Object.keys(likedSongsPlaylist).length > 0)
+            getPlaylistById(likedSongsPlaylist.id).then((res) => {
+                dispatch({
+                    type: type.SET_LIKED_SONGS_PLAYLIST,
+                    playlist: res.data,
+                });
+            });
+    }, [likedSongsPlaylist]);
 
     const handleClick = (target, type) => {
         if (target.classList.contains(cx('active'))) {
@@ -40,7 +86,7 @@ const AuthenticatedUser = () => {
     };
 
     return (
-        <div>
+        <div className={cx('container')}>
             <div className={cx('btns')}>
                 <Button
                     content="Danh sách phát"
@@ -95,6 +141,7 @@ const AuthenticatedUser = () => {
                         );
                     })}
             </ul>
+            {isLoading && <Loading />}
         </div>
     );
 };

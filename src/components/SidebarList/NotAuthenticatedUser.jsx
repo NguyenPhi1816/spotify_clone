@@ -1,11 +1,14 @@
 import classNames from 'classnames/bind';
 import styles from './SidebarList.module.scss';
-import { Fragment } from 'react';
+import { Fragment, useState } from 'react';
 import Button from '../Button';
+import AuthenticationDialog from '../../dialog/AuthenticationDialog';
 
 const cx = classNames.bind(styles);
 
 const NotAuthenticatedUser = () => {
+    const [showDialog, setShowDialog] = useState(false);
+
     return (
         <Fragment>
             <div className={cx('article')}>
@@ -17,6 +20,7 @@ const NotAuthenticatedUser = () => {
                 </p>
                 <div className="btn">
                     <Button
+                        onClick={() => setShowDialog(true)}
                         content="Tạo danh sách phát"
                         customFontSize="14px"
                     />
@@ -30,9 +34,19 @@ const NotAuthenticatedUser = () => {
                     Chúng tôi sẽ cập nhật thông tin cho bạn về các tập mới
                 </p>
                 <div className="btn">
-                    <Button content="Duyệt xem Podcast" customFontSize="14px" />
+                    <Button
+                        onClick={() => setShowDialog(true)}
+                        content="Duyệt xem Podcast"
+                        customFontSize="14px"
+                    />
                 </div>
             </div>
+            {showDialog && (
+                <AuthenticationDialog
+                    message={'Vui lòng đăng nhập để sử dụng chức năng này'}
+                    onClose={() => setShowDialog(false)}
+                />
+            )}
         </Fragment>
     );
 };

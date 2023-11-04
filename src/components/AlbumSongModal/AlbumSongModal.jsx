@@ -6,23 +6,72 @@ import { faClock, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import DashboardSong from '../Song/DashboardSong';
-import ConfirmationDialog from '../../dialog/ConfirmationDialog/ConfirmationDialog';
+import ConfirmationDialog from '../../dialog/ConfirmationDialog';
+import Loading from '../Loading';
+import {
+    addSongToAlbum,
+    getAlbumById,
+    removeSongFromAlbum,
+} from '../../services/albumServices';
 
 const cx = classNames.bind(styles);
 
-const AddSongModal = ({ onClose = () => {} }) => {
+const AlbumSongModal = ({
+    userId = null,
+    albumId = null,
+    onClose = () => {},
+    onChange = () => {},
+}) => {
     const [songs, setSongs] = useState([]);
     const [showAddConfirm, setShowAddConfirm] = useState(false);
+    const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedSongId, setSelectedSongId] = useState(null);
+    const [albumSongs, setAlbumSongs] = useState([]);
+
+    const handleAddSong = (songId) => {
+        setSelectedSongId(songId);
+        setShowAddConfirm(true);
+    };
+
+    const handleRemoveSong = (songId) => {
+        setSelectedSongId(songId);
+        setShowRemoveConfirm(true);
+    };
 
     const handleAddSongToAlbum = () => {
-        console.log('Song added!');
+        if (albumId !== null && selectedSongId !== null)
+            addSongToAlbum(albumId, selectedSongId).then((res) => {
+                setAlbumSongs(res.data.songs);
+            });
+    };
+
+    const handleRemoveSongFromAlbum = () => {
+        if (albumId !== null && selectedSongId !== null)
+            removeSongFromAlbum(albumId, selectedSongId).then((res) => {
+                setAlbumSongs(res.data.songs);
+            });
     };
 
     useEffect(() => {
-        getAlbumsSongsByUserId('18').then((res) => {
-            setSongs(res.data.songs);
-        });
-    }, []);
+        if (userId !== null) {
+            setIsLoading(true);
+            getAlbumsSongsByUserId(userId).then((res) => {
+                setSongs(res.data.songs);
+                setIsLoading(false);
+            });
+        }
+    }, [userId]);
+
+    useEffect(() => {
+        if (albumId !== null) {
+            getAlbumById(albumId).then((res) => setAlbumSongs(res.data.songs));
+        }
+    }, [albumId]);
+
+    useEffect(() => {
+        onChange(albumSongs);
+    }, [albumSongs]);
 
     return (
         <div className={cx('container')}>
@@ -67,10 +116,21 @@ const AddSongModal = ({ onClose = () => {} }) => {
                                     <li key={item.id}>
                                         <DashboardSong
                                             index={index}
-                                            currentList={songs}
                                             data={item}
-                                            addButton
-                                            setAddConfirm={setShowAddConfirm}
+                                            addButton={
+                                                albumSongs.filter(
+                                                    (song) =>
+                                                        song.id === item.id,
+                                                ).length === 0
+                                            }
+                                            deleteButton={
+                                                albumSongs.filter(
+                                                    (song) =>
+                                                        song.id === item.id,
+                                                ).length > 0
+                                            }
+                                            onAddSong={handleAddSong}
+                                            onRemoveSong={handleRemoveSong}
                                             className={cx('dashboard-song')}
                                         />
                                     </li>
@@ -78,6 +138,8 @@ const AddSongModal = ({ onClose = () => {} }) => {
                             </ul>
                         </div>
                     </div>
+
+                    {isLoading && <Loading />}
                 </div>
             </div>
             {showAddConfirm && (
@@ -87,8 +149,15 @@ const AddSongModal = ({ onClose = () => {} }) => {
                     setShow={setShowAddConfirm}
                 />
             )}
+            {showRemoveConfirm && (
+                <ConfirmationDialog
+                    message={'Bạn có muốn xóa bài hát này khỏi album?'}
+                    onConfirm={handleRemoveSongFromAlbum}
+                    setShow={setShowRemoveConfirm}
+                />
+            )}
         </div>
     );
 };
 
-export default AddSongModal;
+export default AlbumSongModal;

@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './Playlist.module.scss';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import PlayButton from '../PlayButton';
 import FavButton from '../FavButton';
@@ -8,18 +8,33 @@ import Song from '../Song';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getPlaylistById } from '../../services/playlistServices';
+import Loading from '../Loading';
+import { type, useAppContext } from '../../Context/Context';
+import {
+    addFavoritePlaylist,
+    getFollowingPlaylist,
+    removeFavoritePlaylist,
+} from '../../services/userServices';
 
 const cx = classNames.bind(styles);
 
 const Playlist = () => {
     const { id } = useParams();
+    const location = useLocation();
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isFavPlaylist, setIsFavPlaylist] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         getPlaylistById(id).then((res) => {
             setData(res.data);
+            setIsLoading(false);
         });
     }, [id]);
+
     const totalDuration = () => {
         const MINUTE = 0;
         const SECOND = 1;
@@ -35,6 +50,60 @@ const Playlist = () => {
         totalMinutes += Math.ceil(totalSeconds / 60);
         return totalMinutes;
     };
+
+    const handlePlayList = () => {
+        if (state.currentPlayingPath !== location.pathname) {
+            console.log('load');
+            dispatch({
+                type: type.LOAD_SONG,
+                currentPlayingPath: location.pathname,
+                currentPlayingList: data.songs,
+                currentPlayingSongIndex: 0,
+            });
+        } else {
+            if (!state.isPlaying) {
+                dispatch({ type: type.PLAY_SONG });
+            } else {
+                dispatch({ type: type.PAUSE_SONG });
+            }
+        }
+    };
+
+    const hanldeLikePlaylist = () => {
+        if (!isFavPlaylist) {
+            addFavoritePlaylist(state.authData.user.id, id).then((res) => {
+                console.log(res);
+                dispatch({
+                    type: type.SET_FAV_PLAYLISTS,
+                    playlists: res.data,
+                });
+                setIsFavPlaylist(true);
+            });
+        } else {
+            removeFavoritePlaylist(state.authData.user.id, id).then((res) => {
+                console.log(res);
+                dispatch({
+                    type: type.SET_FAV_PLAYLISTS,
+                    playlists: res.data,
+                });
+                setIsFavPlaylist(false);
+            });
+        }
+    };
+
+    useEffect(() => {
+        if (state.currentPlayingPath === location.pathname) {
+            setIsPlaying(state.isPlaying);
+        } else {
+            setIsPlaying(false);
+        }
+    });
+
+    useEffect(() => {
+        const playlist = state.favPlaylists.filter((item) => item.id == id);
+        setIsFavPlaylist(playlist.length > 0);
+    }, [state.favPlaylists]);
+
     return (
         <div className={cx('container')}>
             <div
@@ -59,13 +128,17 @@ const Playlist = () => {
             <div className={cx('body')}>
                 <div className={cx('btns')}>
                     <PlayButton
-                        currentListPath={`/playlist/${data.id}`}
-                        currentList={data.songs}
-                        currentIndex={0}
+                        isPlaying={isPlaying}
+                        onClick={handlePlayList}
                         className={cx('btn')}
                         size="56px"
                     />
-                    <FavButton className={cx('btn')} size="32px" />
+                    <FavButton
+                        onClick={hanldeLikePlaylist}
+                        isActive={isFavPlaylist}
+                        className={cx('btn')}
+                        size="32px"
+                    />
                 </div>
                 <ul>
                     <li className={cx('list-header')}>
@@ -96,6 +169,7 @@ const Playlist = () => {
                         ))}
                 </ul>
             </div>
+            {isLoading && <Loading isFitMainLayoutContent />}
         </div>
     );
 };

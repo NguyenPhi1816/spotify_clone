@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from 'react';
+import React, { createContext, useContext, useMemo, useReducer } from 'react';
 
 const AppContext = createContext();
 
@@ -14,6 +14,10 @@ const initialState = {
     volume: 1,
     isRandom: false,
     isLoop: false,
+    isLoading: false,
+    favPlaylists: [],
+    favArtists: [],
+    likedSongsPlaylist: {},
 };
 
 export const type = {
@@ -29,6 +33,9 @@ export const type = {
     SET_RANDOM: 'SET_RANDOM',
     SET_CURRENT_SONG_INDEX: 'SET_CURRENT_SONG_INDEX',
     SET_LOOP: 'SET_LOOP',
+    SET_FAV_PLAYLISTS: 'SET_FAV_PLAYLISTS',
+    SET_FAV_ARTISTS: 'SET_FAV_ARTISTS',
+    SET_LIKED_SONGS_PLAYLIST: 'SET_LIKED_SONGS_PLAYLIST',
 };
 
 const reducer = (state, action) => {
@@ -41,9 +48,21 @@ const reducer = (state, action) => {
             };
         case type.LOGOUT:
             return {
-                ...state,
                 isAuthenticated: false,
-                authData: {},
+                authData: null,
+                isPlaying: false,
+                currentPlayingPath: null,
+                currentPlayingList: null,
+                currentPlayingSongIndex: null,
+                currentPlayingSong: null,
+                currentPlayingSongId: null,
+                volume: 1,
+                isRandom: false,
+                isLoop: false,
+                isLoading: false,
+                favPlaylists: [],
+                favArtists: [],
+                likedSongsPlayList: {},
             };
         case type.LOAD_SONG:
             return {
@@ -99,6 +118,21 @@ const reducer = (state, action) => {
                 ...state,
                 isLoop: !state.isLoop,
             };
+        case type.SET_FAV_PLAYLISTS:
+            return {
+                ...state,
+                favPlaylists: action.playlists,
+            };
+        case type.SET_FAV_ARTISTS:
+            return {
+                ...state,
+                favArtists: action.artists,
+            };
+        case type.SET_LIKED_SONGS_PLAYLIST:
+            return {
+                ...state,
+                likedSongsPlaylist: action.playlist,
+            };
         default:
             return state;
     }
@@ -110,9 +144,10 @@ export const useAppContext = () => {
 
 export const AppProvider = ({ children }) => {
     const [state, dispatch] = useReducer(reducer, initialState);
+    const contextValue = useMemo(() => ({ state, dispatch }), [state]);
 
     return (
-        <AppContext.Provider value={{ state, dispatch }}>
+        <AppContext.Provider value={contextValue}>
             {children}
         </AppContext.Provider>
     );

@@ -18,7 +18,7 @@ const PlaybarAds = () => {
                     </p>
                 </div>
                 <div className={cx('btn')}>
-                    <Button content="Đăng ký miễn phí" />
+                    <Button to="/register" content="Đăng ký miễn phí" />
                 </div>
             </div>
         </div>

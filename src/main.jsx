@@ -22,6 +22,8 @@ import AlbumManagementPage from './pages/AlbumManagementPage';
 import AlbumEditingPage from './pages/AlbumEditingPage';
 import SongEditingPage from './pages/SongEditingPage';
 import UserPage from './pages/UserPage';
+import ProfilePage from './pages/ProfilePage';
+import AudioPlayer from './pages/Test/Test.jsx';
 
 const router = createBrowserRouter([
     {
@@ -66,12 +68,20 @@ const router = createBrowserRouter([
         element: <App Component={ArtistPage} />,
     },
     {
+        path: '/artist/:id/album',
+        element: <App Component={SectionPage} />,
+    },
+    {
         path: '/user/:id',
         element: <App Component={UserPage} />,
     },
     {
         path: '/login',
         element: <App Component={LoginPage} />,
+    },
+    {
+        path: '/profile',
+        element: <App Component={ProfilePage} />,
     },
     {
         path: '/register',
@@ -92,6 +102,10 @@ const router = createBrowserRouter([
     {
         path: '/management/album/:id',
         element: <App Component={AlbumManagementPage} />,
+    },
+    {
+        path: '/test',
+        element: <App Component={AudioPlayer} />,
     },
 ]);
 

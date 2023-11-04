@@ -3,14 +3,20 @@ import styles from './AlbumEditing.module.scss';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faClock, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faClock } from '@fortawesome/free-solid-svg-icons';
 import Button from '../Button';
-import { getAlbumById } from '../../services/albumServices';
+import {
+    changeAlbumName,
+    getAlbumById,
+    removeSongFromAlbum,
+    uploadAlbumImage,
+} from '../../services/albumServices';
 import ConfirmationDialog from '../../dialog/ConfirmationDialog';
 import DashboardSong from '../Song/DashboardSong';
 import AlbumSongModal from '../AlbumSongModal';
 import HeadlessTippy from '../HeadlessTippy';
 import ImageUploadModal from '../ImageUploadModal';
+import Loading from '../Loading';
 
 const cx = classNames.bind(styles);
 
@@ -24,13 +30,29 @@ const AlbumEditing = () => {
     const [showAddSongModal, setShowAddSongModal] = useState(false);
     const [showTippy, setShowTippy] = useState(false);
     const [showUploadImageModal, setShowUploadImageModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [selectedSongId, setSelectedSongId] = useState(null);
 
     const handleChangeTitle = () => {
-        console.log(title);
+        if (title.trim() !== '')
+            changeAlbumName(id, title).then((res) => setData(res.data));
+    };
+
+    const handleShowDeleteConfirm = (songId) => {
+        setSelectedSongId(songId);
+        setShowDeleteSongConfirm(true);
     };
 
     const handleDeleteSong = () => {
-        console.log('Song deleted!');
+        if (selectedSongId !== null) {
+            removeSongFromAlbum(id, selectedSongId).then((res) => {
+                setData(res.data);
+            });
+        }
+    };
+
+    const handleChangeAlbumSongs = (albumSongs) => {
+        setData((prev) => ({ ...prev, songs: albumSongs }));
     };
 
     const handleToggleAddSongModal = () => setShowAddSongModal((prev) => !prev);
@@ -42,14 +64,17 @@ const AlbumEditing = () => {
         setShowUploadImageModal((prev) => !prev);
     };
 
-    const handleChangeImage = (file) => {
-        console.log(file.name);
+    const handleChangeImage = async (file) => {
+        await uploadAlbumImage(id, file).then((res) => setData(res.data));
+
         setShowUploadImageModal(false);
     };
 
     useEffect(() => {
+        setIsLoading(true);
         getAlbumById(id).then((res) => {
             setData(res.data);
+            setIsLoading(false);
         });
     }, [id]);
 
@@ -62,9 +87,14 @@ const AlbumEditing = () => {
         const handleBlurTitle = () => {
             albumNameRef.current.contentEditable = false;
             const new_title = albumNameRef.current.innerText;
-            if (new_title.trim() !== data.name.trim()) {
+            if (
+                new_title.trim() !== '' &&
+                new_title.trim() !== data.name.trim()
+            ) {
                 setTitle(albumNameRef.current.innerText);
                 setShowTitleChangeConfirm(true);
+            } else {
+                albumNameRef.current.innerText = data.name;
             }
         };
 
@@ -179,12 +209,9 @@ const AlbumEditing = () => {
                                 <li key={item.id}>
                                     <DashboardSong
                                         index={index}
-                                        currentList={data.songs}
                                         data={item}
                                         deleteButton
-                                        setDeleteConfirm={
-                                            setShowDeleteSongConfirm
-                                        }
+                                        onRemoveSong={handleShowDeleteConfirm}
                                     />
                                 </li>
                             ))}
@@ -213,7 +240,12 @@ const AlbumEditing = () => {
                 />
             )}
             {showAddSongModal && (
-                <AlbumSongModal onClose={handleToggleAddSongModal} />
+                <AlbumSongModal
+                    userId={data.user.id}
+                    albumId={id}
+                    onChange={handleChangeAlbumSongs}
+                    onClose={handleToggleAddSongModal}
+                />
             )}
             {showUploadImageModal && (
                 <ImageUploadModal
@@ -221,6 +253,7 @@ const AlbumEditing = () => {
                     onClose={handleShowUploadImageModal}
                 />
             )}
+            {isLoading && <Loading />}
         </div>
     );
 };

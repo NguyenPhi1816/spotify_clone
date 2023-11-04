@@ -6,12 +6,36 @@ import { Link } from 'react-router-dom';
 const cx = classNames.bind(styles);
 
 function CategoryItem({ data = {} }) {
+    const BLACK = '#000000';
+    const WHITE = '#ffffff';
+
     const [randomColor, setRandomColor] = useState('');
 
     const generateRandomColor = () => {
-        const randomColor =
-            '#' + Math.floor(Math.random() * 16777215).toString(16); // Generates a random hex color code
-        return randomColor;
+        let threshold = 50;
+
+        while (true) {
+            let red = Math.floor(Math.random() * 256);
+            let green = Math.floor(Math.random() * 256);
+            let blue = Math.floor(Math.random() * 256);
+
+            if (
+                (red > 255 - threshold &&
+                    green > 255 - threshold &&
+                    blue > 255 - threshold) ||
+                (red < threshold && green < threshold && blue < threshold)
+            ) {
+                continue;
+            }
+
+            let hexColor =
+                '#' +
+                ((1 << 24) | (red << 16) | (green << 8) | blue)
+                    .toString(16)
+                    .slice(1);
+
+            return hexColor;
+        }
     };
 
     useEffect(() => {

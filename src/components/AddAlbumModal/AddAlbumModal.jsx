@@ -3,10 +3,22 @@ import styles from './AddAlbumModal.module.scss';
 import Button from '../Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
+import { useState } from 'react';
 
 const cx = classNames.bind(styles);
 
 const AddAlbumModal = ({ onClose, onSave }) => {
+    const [albumName, setAlbumName] = useState('');
+
+    const handleChange = (e) => {
+        const value = e.target.value;
+        if (!value.startsWith(' ')) setAlbumName(e.target.value);
+    };
+
+    const handleSubmit = () => {
+        onSave(albumName);
+    };
+
     return (
         <div className={cx('container')}>
             <div className={cx('wrapper')}>
@@ -21,7 +33,12 @@ const AddAlbumModal = ({ onClose, onSave }) => {
                 </div>
                 <div className={cx('body')}>
                     <form className={cx('form')}>
-                        <input type="text" placeholder="Nhập tên album..." />
+                        <input
+                            value={albumName}
+                            onChange={(e) => handleChange(e)}
+                            type="text"
+                            placeholder="Nhập tên album..."
+                        />
                     </form>
                 </div>
                 <div className={cx('footer')}>
@@ -31,7 +48,10 @@ const AddAlbumModal = ({ onClose, onSave }) => {
                         content="Để sau"
                         className={cx('btn-cancel')}
                     />
-                    <Button onClick={onSave} content="Lưu và thêm bài hát" />
+                    <Button
+                        onClick={handleSubmit}
+                        content="Lưu và thêm bài hát"
+                    />
                 </div>
             </div>
         </div>

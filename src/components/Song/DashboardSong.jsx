@@ -15,14 +15,18 @@ const DashboardSong = ({
     addButton = false,
     deleteButton = false,
     toggleButton = false,
-    setAddConfirm = () => {},
-    setDeleteConfirm = () => {},
+    onAddSong = () => {},
+    onRemoveSong = () => {},
 }) => {
     const [isActive, setIsActive] = useState(true);
     const [showConfirm, setShowConfirm] = useState(false);
 
     const calculateCreatedDate = (createdDateStr) => {
-        const createdDate = new Date(createdDateStr);
+        const [datePart, timePart] = createdDateStr.split(' ');
+        const [day, month, year] = datePart.split('/');
+        const newDate = month + '/' + day + '/' + year + ' ' + timePart;
+
+        const createdDate = new Date(newDate);
         const currentDate = new Date();
         const diff = currentDate - createdDate;
         const daysDiff = Math.floor(diff / (1000 * 60 * 60 * 24));
@@ -96,7 +100,7 @@ const DashboardSong = ({
                     {deleteButton && (
                         <span
                             className={cx('remove')}
-                            onClick={() => setDeleteConfirm(true)}
+                            onClick={() => onRemoveSong(data.id)}
                         >
                             <FontAwesomeIcon icon={faTrashCan} />
                         </span>
@@ -104,7 +108,7 @@ const DashboardSong = ({
                     {addButton && (
                         <span
                             className={cx('add')}
-                            onClick={() => setAddConfirm(true)}
+                            onClick={() => onAddSong(data.id)}
                         >
                             <FontAwesomeIcon icon={faPlus} />
                         </span>

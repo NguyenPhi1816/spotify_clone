@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './ArtistSection.module.scss';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import PlayButton from '../PlayButton';
@@ -18,6 +18,14 @@ import {
     getAlbumsSongsByUserId,
     getUserById,
 } from '../../services/userServices';
+import Loading from '../Loading';
+import { type, useAppContext } from '../../Context/Context';
+import {
+    addFavArtist,
+    getFavArtist,
+    removeFavArtist,
+} from '../../services/followerServices';
+import ShelfItem from '../ShelfItem';
 
 const cx = classNames.bind(styles);
 
@@ -26,13 +34,22 @@ const ArtistSection = () => {
     const DISPLAYED_SONG_NUMBERS = 10;
 
     const { id } = useParams();
+    const location = useLocation();
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [albums, setAlbums] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(5);
     const [isShowMore, setIsShowMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [isFavArtist, setIsFavArtist] = useState(false);
 
     useEffect(() => {
-        getUserById(id).then((res) => setData(res.data));
+        setIsLoading(true);
+        getUserById(id).then((res) => {
+            setData(res.data);
+            setIsLoading(false);
+        });
     }, [id]);
 
     useEffect(() => {
@@ -48,6 +65,63 @@ const ArtistSection = () => {
     const handleShowMore = () => {
         setIsShowMore((prev) => !prev);
     };
+
+    const handlePlayList = () => {
+        if (state.currentPlayingPath !== location.pathname) {
+            console.log('load');
+            dispatch({
+                type: type.LOAD_SONG,
+                currentPlayingPath: location.pathname,
+                currentPlayingList: data.songs,
+                currentPlayingSongIndex: 0,
+            });
+        } else {
+            if (!state.isPlaying) {
+                dispatch({ type: type.PLAY_SONG });
+            } else {
+                dispatch({ type: type.PAUSE_SONG });
+            }
+        }
+    };
+
+    const hanldeLikeArtist = async () => {
+        if (!isFavArtist) {
+            await addFavArtist(state.authData.user.id, id);
+            setTimeout(() => {
+                getFavArtist(state.authData.user.id).then((res) => {
+                    dispatch({
+                        type: type.SET_FAV_ARTISTS,
+                        artists: res.data,
+                    });
+                    setIsFavArtist(true);
+                });
+            }, 500);
+        } else {
+            await removeFavArtist(state.authData.user.id, id);
+            setTimeout(() => {
+                getFavArtist(state.authData.user.id).then((res) => {
+                    dispatch({
+                        type: type.SET_FAV_ARTISTS,
+                        artists: res.data,
+                    });
+                    setIsFavArtist(false);
+                });
+            }, 500);
+        }
+    };
+
+    useEffect(() => {
+        if (state.currentPlayingPath === location.pathname) {
+            setIsPlaying(state.isPlaying);
+        } else {
+            setIsPlaying(false);
+        }
+    });
+
+    useEffect(() => {
+        const artist = state.favArtists.filter((item) => item.id == id);
+        setIsFavArtist(artist.length > 0);
+    }, [state.favPlaylists]);
 
     return (
         <div className={cx('container')}>
@@ -83,13 +157,17 @@ const ArtistSection = () => {
             <div className={cx('body')}>
                 <div className={cx('btns')}>
                     <PlayButton
-                        currentListPath={`/artist/${data.id}`}
-                        currentList={data.songs}
-                        currentIndex={0}
+                        isPlaying={isPlaying}
+                        onClick={handlePlayList}
                         className={cx('btn')}
                         size="56px"
                     />
-                    <FavButton className={cx('btn')} size="32px" />
+                    <FavButton
+                        onClick={hanldeLikeArtist}
+                        isActive={isFavArtist}
+                        className={cx('btn')}
+                        size="32px"
+                    />
                 </div>
                 <div className={cx('song-container')}>
                     <h3>Phổ biến</h3>
@@ -135,14 +213,17 @@ const ArtistSection = () => {
                     </ul>
                 </div>
                 <div className={cx('artist-album-container')}>
-                    <Shelf
-                        shelfData={{
-                            title: 'Album',
-                            playlists: albums,
-                        }}
-                        itemType="album"
-                        showAllLink={`/artist/${id}/album`}
-                    />
+                    <Shelf title="Album" to={`/artist/${id}/album`}>
+                        {albums.map((item) => (
+                            <li key={item.id}>
+                                <ShelfItem
+                                    shelfItemData={item}
+                                    edit={false}
+                                    type="album"
+                                />
+                            </li>
+                        ))}
+                    </Shelf>
                 </div>
                 <div className={cx('artist-info-container')}>
                     <h3>Giới thiệu</h3>
@@ -172,6 +253,7 @@ const ArtistSection = () => {
                     </div>
                 </div>
             </div>
+            {isLoading && <Loading isFitMainLayoutContent />}
         </div>
     );
 };

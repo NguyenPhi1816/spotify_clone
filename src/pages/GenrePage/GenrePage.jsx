@@ -7,24 +7,28 @@ import Playbar from '../../components/Playbar';
 import Sidebar from '../../components/Sidebar';
 import MainLayout from '../../layouts/MainLayout';
 import { getCategoryChildById } from '../../services/categoryServices';
+import Loading from '../../components/Loading';
 
 const GenrePage = () => {
     const { id, title } = useParams();
     const [data, setData] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         getCategoryChildById(id).then((res) => {
-            return setData(res.data);
+            setData(res.data);
+            setIsLoading(false);
         });
     }, []);
-
-    // console.log(data);
 
     return (
         <MainLayout
             Sidebar={<Sidebar />}
             Navbar={<Navbar />}
-            Content={<Content title={title} data={data} />}
+            Content={
+                isLoading ? <Loading /> : <Content title={title} data={data} />
+            }
             Playbar={<Playbar />}
         />
     );

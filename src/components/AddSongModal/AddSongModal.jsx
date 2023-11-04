@@ -11,13 +11,17 @@ import { useRef, useState } from 'react';
 import ImageUploadModal from '../ImageUploadModal';
 import AudioUploadModal from '../AudioUploadModal';
 import TextEditor from '../TextEditor';
+import { useAppContext } from '../../Context/Context';
 
 const cx = classNames.bind(styles);
 
 const AddSongModal = ({ onClose, onSubmit }) => {
     const lyricsRef = useRef();
+    const errorMessageRef = useRef();
+    const { state } = useAppContext();
     const [name, setName] = useState('');
-    const [genre, setGenre] = useState('');
+    const [genre, setGenre] = useState('POP');
+    const [sentiment, setSentiment] = useState('happy');
     const [lyrics, setLyrics] = useState(null);
     const [selectedImage, setSelectedImage] = useState(null);
     const [selectedAudio, setSelectedAudio] = useState(null);
@@ -25,23 +29,23 @@ const AddSongModal = ({ onClose, onSubmit }) => {
     const [showAudio, setShowAudio] = useState(false);
     const [showLyrics, setShowLyrics] = useState(false);
 
-    const readFile = (setter, file) => {
+    const readFile = (file) => {
         if (file) {
             const reader = new FileReader();
             reader.onload = (e) => {
-                setter(e.target.result);
+                return e.target.result;
             };
             reader.readAsDataURL(file);
         }
     };
 
     const handleUploadImage = (file) => {
-        readFile(setSelectedImage, file);
+        setSelectedImage(file);
         setShowImage(false);
     };
 
     const handleUploadAudio = (file) => {
-        readFile(setSelectedAudio, file);
+        setSelectedAudio(file);
         setShowAudio(false);
     };
 
@@ -66,13 +70,59 @@ const AddSongModal = ({ onClose, onSubmit }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        const data = { name, genre, selectedImage, selectedAudio, lyrics };
-        onSubmit(data);
+        if (
+            name !== '' &&
+            genre !== '' &&
+            selectedAudio !== null &&
+            lyrics !== '' &&
+            sentiment !== '' &&
+            selectedImage !== null
+        ) {
+            errorMessageRef.current.innerText = '';
+
+            const currentDate = new Date();
+            const audio = new Audio();
+            audio.src = URL.createObjectURL(selectedAudio);
+            audio.addEventListener('loadedmetadata', function () {
+                // Lấy duration của audio
+                const audioDuration = Math.floor(audio.duration);
+
+                const data = {
+                    name,
+                    genre,
+                    duration: audioDuration,
+                    lyric: lyrics,
+                    day: currentDate.getDate(),
+                    month: currentDate.getMonth() + 1,
+                    year: currentDate.getFullYear(),
+                    label: sentiment,
+                    usersId: state.authData.user.id,
+                };
+
+                onSubmit(data, selectedAudio, selectedImage);
+
+                // Giải phóng tài nguyên sau khi sử dụng
+                URL.revokeObjectURL(audio.src);
+            });
+
+            audio.addEventListener('error', function (e) {
+                errorMessageRef.current.innerText =
+                    'Có lỗi xảy ra khi tải tệp âm thanh';
+            });
+        } else {
+            errorMessageRef.current.innerText =
+                'Vui lòng điền đầy đủ thông tin';
+        }
     };
 
-    const handleNameChange = (e) => setName(e.target.value);
+    const handleNameChange = (e) => {
+        const value = e.target.value;
+        if (!value.startsWith(' ')) setName(value);
+    };
 
     const handleGenreChange = (e) => setGenre(e.target.value);
+
+    const handleSentimentChange = (e) => setSentiment(e.target.value);
 
     return (
         <div className={cx('container')}>
@@ -99,10 +149,23 @@ const AddSongModal = ({ onClose, onSubmit }) => {
                         <label className={cx('form-group')}>
                             <p>Thể loại</p>
                             <select onChange={handleGenreChange}>
-                                <option value="pop">Pop</option>
-                                <option value="ballad">Ballad</option>
-                                <option value="rock">Rock</option>
-                                <option value="hiphop">Hiphop</option>
+                                <option value="POP">Pop</option>
+                                <option value="BALLAD">Ballad</option>
+                                <option value="ROCK">Rock</option>
+                                <option value="HIPHOP">Hiphop</option>
+                                <option value="CLASSICAL">Classical</option>
+                            </select>
+                        </label>
+                        <label className={cx('form-group')}>
+                            <p>Cảm xúc của bài hát</p>
+                            <select onChange={handleSentimentChange}>
+                                <option value="happy">Vui</option>
+                                <option value="sad">Buồn</option>
+                                <option value="energetic">Năng lượng</option>
+                                <option value="relax">Thư giãn</option>
+                                <option value="cant predicted">
+                                    Chưa xác định
+                                </option>
                             </select>
                         </label>
                         <label className={cx('form-group')}>
@@ -113,7 +176,7 @@ const AddSongModal = ({ onClose, onSubmit }) => {
                             >
                                 {selectedImage ? (
                                     <img
-                                        src={selectedImage}
+                                        src={URL.createObjectURL(selectedImage)}
                                         alt="Seleted Image"
                                     />
                                 ) : (
@@ -128,7 +191,9 @@ const AddSongModal = ({ onClose, onSubmit }) => {
                                     <>
                                         <audio controls>
                                             <source
-                                                src={selectedAudio}
+                                                src={URL.createObjectURL(
+                                                    selectedAudio,
+                                                )}
                                                 type="audio/mpeg"
                                             />
                                             Your browser does not support the
@@ -177,6 +242,10 @@ const AddSongModal = ({ onClose, onSubmit }) => {
                                 </div>
                             </div>
                         </label>
+                        <p
+                            className={cx('error-message')}
+                            ref={errorMessageRef}
+                        ></p>
                         <label className={cx('form-group')}>
                             <input
                                 onClick={handleSubmit}

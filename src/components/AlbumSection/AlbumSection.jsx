@@ -1,6 +1,6 @@
 import classNames from 'classnames/bind';
 import styles from './AlbumSection.module.scss';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
 import { useState } from 'react';
 import { useEffect } from 'react';
 import PlayButton from '../PlayButton';
@@ -12,6 +12,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { getAlbumById } from '../../services/albumServices';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
+import Loading from '../Loading';
+import { type, useAppContext } from '../../Context/Context';
+import MessageDialog from '../../dialog/MessageDialog';
+import { types } from '../../dialog/MessageDialog/MessageDialog';
+import ShelfItem from '../ShelfItem';
 
 const cx = classNames.bind(styles);
 
@@ -20,16 +25,23 @@ const AlbumSection = () => {
     const DISPLAYED_SONG_NUMBERS = 10;
 
     const { id } = useParams();
+    const location = useLocation();
+    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [artist, setArtist] = useState({});
     const [albums, setAlbums] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(5);
     const [isShowMore, setIsShowMore] = useState(true);
+    const [isLoading, setIsLoading] = useState(false);
+    const [isPlaying, setIsPlaying] = useState(false);
+    const [showDialog, setShowDialog] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         getAlbumById(id).then((res) => {
             setData(res.data);
             setArtist(res.data.user);
+            setIsLoading(false);
         });
     }, [id]);
 
@@ -50,6 +62,32 @@ const AlbumSection = () => {
     const handleShowMore = () => {
         setIsShowMore((prev) => !prev);
     };
+
+    const handlePlayAlbum = () => {
+        if (state.currentPlayingPath !== location.pathname) {
+            console.log('load');
+            dispatch({
+                type: type.LOAD_SONG,
+                currentPlayingPath: location.pathname,
+                currentPlayingList: data.songs,
+                currentPlayingSongIndex: 0,
+            });
+        } else {
+            if (!state.isPlaying) {
+                dispatch({ type: type.PLAY_SONG });
+            } else {
+                dispatch({ type: type.PAUSE_SONG });
+            }
+        }
+    };
+
+    useEffect(() => {
+        if (state.currentPlayingPath === location.pathname) {
+            setIsPlaying(state.isPlaying);
+        } else {
+            setIsPlaying(false);
+        }
+    });
 
     return (
         <div className={cx('container')}>
@@ -106,13 +144,17 @@ const AlbumSection = () => {
                 ></div>
                 <div className={cx('btns')}>
                     <PlayButton
-                        currentListPath={`/album/${data.id}`}
-                        currentList={data.songs}
-                        currentIndex={0}
+                        isPlaying={isPlaying}
+                        onClick={handlePlayAlbum}
                         className={cx('btn')}
                         size="56px"
                     />
-                    <FavButton className={cx('btn')} size="32px" />
+                    <FavButton
+                        isActive={false}
+                        onClick={() => setShowDialog(true)}
+                        className={cx('btn')}
+                        size="32px"
+                    />
                 </div>
                 <div className={cx('song-container')}>
                     <ul className={cx('song-list')}>
@@ -172,17 +214,31 @@ const AlbumSection = () => {
                 </div>
                 <div className={cx('artist-album-container')}>
                     <Shelf
-                        shelfData={{
-                            title: `Các album khác của ${
-                                data.user && data.user.fullName
-                            }`,
-                            playlists: albums,
-                        }}
-                        itemType="album"
-                        showAllLink={`/artist/${artist.id}/album`}
-                    />
+                        title={`Các album khác của ${
+                            data.user && data.user.fullName
+                        }`}
+                        to={`/artist/${artist.id}/album`}
+                    >
+                        {albums.map((item) => (
+                            <li key={item.id}>
+                                <ShelfItem
+                                    shelfItemData={item}
+                                    edit={false}
+                                    type="album"
+                                />
+                            </li>
+                        ))}
+                    </Shelf>
                 </div>
             </div>
+            {isLoading && <Loading isFitMainLayoutContent />}
+            {showDialog && (
+                <MessageDialog
+                    type={types.INFORMATION}
+                    message={'Tính năng đang được phát triển'}
+                    setShow={setShowDialog}
+                />
+            )}
         </div>
     );
 };

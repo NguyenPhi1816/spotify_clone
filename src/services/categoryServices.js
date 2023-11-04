@@ -11,3 +11,11 @@ export const getHomeCategory = () => {
 export const getAllCategories = () => {
     return api.get('/category/getAllParent');
 };
+
+export const getCategoriesById = (id) => {
+    return api.get(`/category/${id}`);
+};
+
+export const searchByKeyword = (keyword) => {
+    return api.get(`/category/search/${keyword}`);
+};

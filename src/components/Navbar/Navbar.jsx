@@ -11,21 +11,25 @@ import {
 
 import Button from '../Button';
 import HeadlessTippy from '../HeadlessTippy';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { type, useAppContext } from '../../Context/Context';
 import SearchByEmotion from '../SearchByEmotion';
 import { isArtist } from '../../services/authorizationServices';
 import { removeAuthCookie } from '../../cookies/removeCookie';
+import useDebounce from '../../hooks/useDebounce';
 
 const cx = classNames.bind(styles);
 
-function Navbar({ showSearchBar = false }) {
+function Navbar({ onSearch = () => {}, showSearchBar = false }) {
     const { state, dispatch } = useAppContext();
 
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [searchValue, setSearchValue] = useState('');
+
+    const debounceValue = useDebounce(searchValue, 500);
 
     const handleShowToolTip = () => setShow((prev) => !prev);
     const handleGoForward = () => navigate(1);
@@ -38,6 +42,15 @@ function Navbar({ showSearchBar = false }) {
     };
 
     const handleShowModal = () => setShowModal((prev) => !prev);
+
+    const handleChangeSearchValue = (e) => {
+        const value = e.target.value;
+        if (!value.startsWith(' ')) setSearchValue(value);
+    };
+
+    useEffect(() => {
+        onSearch(debounceValue);
+    }, [debounceValue]);
 
     return (
         <nav className={cx('container')}>
@@ -62,7 +75,11 @@ function Navbar({ showSearchBar = false }) {
                             <div className={cx('icon')}>
                                 <FontAwesomeIcon icon={faMagnifyingGlass} />
                             </div>
-                            <input placeholder="Bạn muốn nghe gì?" />
+                            <input
+                                value={searchValue}
+                                onChange={handleChangeSearchValue}
+                                placeholder="Bạn muốn nghe gì?"
+                            />
                         </label>
                         <HeadlessTippy
                             items={
@@ -120,6 +137,7 @@ function Navbar({ showSearchBar = false }) {
                                     content={<p>Hồ sơ</p>}
                                 />
                                 <Button
+                                    to={'/profile'}
                                     className={cx('tippy-btn')}
                                     noBackground
                                     content={<p>Chỉnh sửa hồ sơ</p>}

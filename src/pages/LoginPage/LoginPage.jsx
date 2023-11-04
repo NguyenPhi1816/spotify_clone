@@ -7,30 +7,30 @@ import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { authenticate } from '../../services/authenticationServices';
 import { type, useAppContext } from '../../Context/Context';
 import { setAuthCookie } from '../../cookies/setCookie';
-import { getAuthCookie } from '../../cookies/getCookie';
+import Loading from '../../components/Loading';
+import { useForm } from 'react-hook-form';
+import MessageDialog from '../../dialog/MessageDialog';
+import { types } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const LoginPage = () => {
-    const { dispatch } = useAppContext();
+    const ERR_NETWORK = 'ERR_NETWORK';
+    const ERR_BAD_REQUEST = 'ERR_BAD_REQUEST';
 
-    const [rememberMe, setRememberMe] = useState(true);
-    const [showPass, setShowPass] = useState(false);
-    const [formData, setFormData] = useState({
-        email: '',
-        pass: '',
-    });
-    const [resData, setResData] = useState({});
+    const {
+        register,
+        handleSubmit,
+        formState: { errors },
+    } = useForm({ mode: 'onBlur' });
 
     const navigate = useNavigate();
-
-    const handleInputChange = (event) => {
-        const { name, value } = event.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
+    const { dispatch } = useAppContext();
+    const [rememberMe, setRememberMe] = useState(true);
+    const [showPass, setShowPass] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
+    const [message, setMessage] = useState('');
+    const [showMessageDialog, setShowMessageDialog] = useState(false);
 
     const handleRemember = (e) => {
         e.preventDefault();
@@ -42,11 +42,10 @@ const LoginPage = () => {
         return setShowPass((prev) => !prev);
     };
 
-    const handleSubmitForm = (e) => {
-        e.preventDefault();
-        authenticate(formData.email, formData.pass)
+    const handleSubmitForm = (data) => {
+        setIsLoading(true);
+        authenticate(data.email, data.password)
             .then((res) => {
-                setResData(res.data);
                 if (rememberMe) {
                     delete res.data.user.songs;
                     setAuthCookie(res.data);
@@ -55,7 +54,19 @@ const LoginPage = () => {
                 navigate('/');
             })
             .catch((err) => {
-                console.log(err);
+                if (err.code === ERR_NETWORK) {
+                    setMessage(
+                        'Có lỗi xảy ra trong quá trình đăng nhập. Vui lòng thử lại.',
+                    );
+                } else if (err.code === ERR_BAD_REQUEST) {
+                    setMessage(
+                        'Tài khoản hoặc mật khẩu không đúng. Vui lòng thử lại.',
+                    );
+                } else {
+                    setMessage('Lỗi không xác định. Vui lòng thử lại');
+                }
+                setIsLoading(false);
+                setShowMessageDialog(true);
             });
     };
 
@@ -73,16 +84,35 @@ const LoginPage = () => {
                 <div className={cx('body')}>
                     <div className={cx('container')}>
                         <h1>Đăng nhập vào Spotify</h1>
-                        <form className={cx('form')}>
+                        <form
+                            onSubmit={handleSubmit(handleSubmitForm)}
+                            className={cx('form')}
+                        >
                             <label className={cx('form-group')}>
                                 <p>Email hoặc tên người dùng</p>
                                 <input
                                     type="text"
                                     name="email"
-                                    value={formData.email}
-                                    onChange={handleInputChange}
+                                    {...register('email', {
+                                        required: true,
+                                        pattern:
+                                            /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
+                                    })}
+                                    className={cx({
+                                        'error-input': errors.email,
+                                    })}
                                     placeholder="Email hoặc tên người dùng"
                                 />
+                                {errors.email?.type === 'required' && (
+                                    <span className={cx('error-message')}>
+                                        Vui lòng nhập email
+                                    </span>
+                                )}
+                                {errors.email?.type === 'pattern' && (
+                                    <span className={cx('error-message')}>
+                                        Email không hợp lệ
+                                    </span>
+                                )}
                             </label>
                             <label className={cx('form-group')}>
                                 <p>Mật khẩu</p>
@@ -90,8 +120,13 @@ const LoginPage = () => {
                                     <input
                                         type={showPass ? 'text' : 'password'}
                                         name="pass"
-                                        value={formData.pass}
-                                        onChange={handleInputChange}
+                                        {...register('password', {
+                                            required: true,
+                                            minLength: 8,
+                                        })}
+                                        className={cx({
+                                            'error-input': errors.password,
+                                        })}
                                         placeholder="Mật khẩu"
                                     />
                                     <button
@@ -112,6 +147,16 @@ const LoginPage = () => {
                                         />
                                     </button>
                                 </div>
+                                {errors.password?.type === 'required' && (
+                                    <span className={cx('error-message')}>
+                                        Vui lòng nhập mật khẩu
+                                    </span>
+                                )}
+                                {errors.password?.type === 'minLength' && (
+                                    <span className={cx('error-message')}>
+                                        Độ dài mật khẩu phải lớn hơn 8 ký tự
+                                    </span>
+                                )}
                             </label>
                             <div className={cx('toggle')}>
                                 <button
@@ -126,11 +171,12 @@ const LoginPage = () => {
                                 </button>
                                 <p>Hãy nhớ tôi</p>
                             </div>
-                            <label
-                                className={cx('form-group')}
-                                onClick={(e) => handleSubmitForm(e)}
-                            >
-                                <input type="submit" value="Đăng nhập" />
+                            <label className={cx('form-group')}>
+                                <input
+                                    disabled={Object.keys(errors).length > 0}
+                                    type="submit"
+                                    value="Đăng nhập"
+                                />
                             </label>
                         </form>
                         <Link to="/forgot-password" className={cx('underline')}>
@@ -145,6 +191,14 @@ const LoginPage = () => {
                     </div>
                 </div>
             </div>
+            {showMessageDialog && (
+                <MessageDialog
+                    message={message}
+                    type={types.ERROR}
+                    setShow={setShowMessageDialog}
+                />
+            )}
+            {isLoading && <Loading />}
         </section>
     );
 };

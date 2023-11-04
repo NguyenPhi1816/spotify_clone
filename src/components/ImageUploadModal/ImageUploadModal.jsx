@@ -43,8 +43,23 @@ export default function ImageUploadModal({ handleUploadFile, onClose }) {
                     />
                 </div>
                 <div className={cx('body')}>
-                    <form className={cx('form')}>
+                    <form className={cx('form')} encType="multipart/form-data">
                         <div className={cx('file-drop-area')}>
+                            <div
+                                className={cx('selected-image')}
+                                onClick={() =>
+                                    document
+                                        .getElementById('file-input')
+                                        .click()
+                                }
+                            >
+                                {file && (
+                                    <img
+                                        src={URL.createObjectURL(file)}
+                                        alt="Selected"
+                                    />
+                                )}
+                            </div>
                             <span className={cx('fake-btn')}>Choose files</span>
                             <span className={cx('file-msg')}>
                                 {file
@@ -52,6 +67,7 @@ export default function ImageUploadModal({ handleUploadFile, onClose }) {
                                     : 'or drag and drop files here'}
                             </span>
                             <input
+                                id="file-input"
                                 className={cx('file-input')}
                                 type="file"
                                 onChange={(e) => handleChange(e)}

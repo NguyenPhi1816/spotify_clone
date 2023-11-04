@@ -1,109 +1,33 @@
 import classNames from 'classnames/bind';
 import styles from './Section.module.scss';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import ShelfItem from '../ShelfItem';
+import { useEffect, useState } from 'react';
+import { getCategoriesById } from '../../services/categoryServices';
+import { getAlbumsSongsByUserId } from '../../services/userServices';
 
 const cx = classNames.bind(styles);
 
 const Section = () => {
-    const id = useParams();
+    const { id } = useParams();
+    const location = useLocation();
+    const [type, setType] = useState('');
+    const [data, setData] = useState({});
 
-    const data = {
-        id: 2,
-        title: 'Danh sách phát trên Spotify',
-        items: [
-            {
-                id: 1,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 2,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 3,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 4,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 5,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 6,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 7,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 8,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 9,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 10,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 11,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 12,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 13,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 14,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-            {
-                id: 15,
-                imagePath: '../src/assets/images/den_vau.jpg',
-                name: "Today's Top Hits",
-                description: 'Doja Cat is on top of the Hottest 50!',
-            },
-        ],
-    };
+    useEffect(() => {
+        if (location.pathname === `/section/${id}`) {
+            setType('playlist');
+            getCategoriesById(id).then((res) => setData(res.data));
+        } else if (location.pathname === `/artist/${id}/album`) {
+            setType('album');
+            getAlbumsSongsByUserId(id).then((res) => {
+                setData({
+                    title: 'Danh sách album',
+                    playlists: res.data.albums,
+                });
+            });
+        }
+    }, [id]);
 
     return (
         <section className={cx('container')}>
@@ -112,9 +36,9 @@ const Section = () => {
             </div>
             <div>
                 <ul className={cx('list')}>
-                    {data.items.map((item) => (
+                    {data.playlists?.map((item) => (
                         <li key={item.id}>
-                            <ShelfItem shelfItemData={item} />
+                            <ShelfItem type={type} shelfItemData={item} />
                         </li>
                     ))}
                 </ul>

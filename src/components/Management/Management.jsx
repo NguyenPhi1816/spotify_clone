@@ -10,6 +10,8 @@ import {
     getUserById,
 } from '../../services/userServices';
 import DashboardSong from '../Song/DashboardSong';
+import Loading from '../Loading';
+import ShelfItem from '../ShelfItem';
 
 const cx = classNames.bind(styles);
 
@@ -22,18 +24,20 @@ const Management = () => {
     const [albums, setAlbums] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(5);
     const [isShowMore, setIsShowMore] = useState(true);
-    const [showDeleteSongConfirm, setShowDeleteSongConfirm] = useState(false);
-
-    const handleDeleteSong = () => {
-        console.log('Song deleted!');
-    };
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
-        getUserById(id).then((res) => setData(res.data));
+        setIsLoading(true);
+        getUserById(id).then((res) => {
+            setData(res.data);
+        });
     }, [id]);
 
     useEffect(() => {
-        getAlbumsSongsByUserId(id).then((res) => setAlbums(res.data.albums));
+        getAlbumsSongsByUserId(id).then((res) => {
+            setAlbums(res.data.albums);
+            setIsLoading(false);
+        });
     }, [id]);
 
     useEffect(() => {
@@ -101,17 +105,23 @@ const Management = () => {
                 {albums.length > 0 && (
                     <div className={cx('artist-album-container')}>
                         <Shelf
-                            shelfData={{
-                                title: 'Danh sách album',
-                                playlists: albums,
-                            }}
-                            editShelf
-                            itemType="album"
-                            showAllLink={`/management/album/${id}`}
-                        />
+                            title="Danh sách album"
+                            to={`/management/album/${id}`}
+                        >
+                            {albums.map((item) => (
+                                <li key={item.id}>
+                                    <ShelfItem
+                                        shelfItemData={item}
+                                        edit={true}
+                                        type="album"
+                                    />
+                                </li>
+                            ))}
+                        </Shelf>
                     </div>
                 )}
             </div>
+            {isLoading && <Loading />}
         </div>
     );
 };

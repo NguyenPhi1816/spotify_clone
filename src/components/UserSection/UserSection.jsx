@@ -9,6 +9,8 @@ import { useRef } from 'react';
 import { useAppContext } from '../../Context/Context';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import { getFollowingsByUserId } from '../../services/followingServices';
+import Loading from '../Loading';
+import ArtistCard from '../ArtistCard/ArtistCard';
 
 const cx = classNames.bind(styles);
 
@@ -24,11 +26,14 @@ const UserSection = () => {
     const [numberOfSongs, setNumberOfSongs] = useState(5);
     const [isShowMore, setIsShowMore] = useState(true);
     const [containerWidth, setContainerWidth] = useState(0);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(() => {
+        setIsLoading(true);
         if (user.id) {
             getAlbumsSongsByUserId(user.id).then((res) => {
                 setSongs(res.data.songs);
+                setIsLoading(false);
             });
         }
     }, [user]);
@@ -148,41 +153,14 @@ const UserSection = () => {
                         >
                             {following.map((item) => (
                                 <li key={item.id}>
-                                    <Link
-                                        to={`/artist/${item.id}`}
-                                        className={cx('link')}
-                                    >
-                                        <div className={cx('container')}>
-                                            <div className={cx('top')}>
-                                                <div
-                                                    className={cx(
-                                                        'thumb-container',
-                                                    )}
-                                                >
-                                                    <img
-                                                        src={
-                                                            item.photoImagePath
-                                                        }
-                                                        alt={item.fullName}
-                                                    />
-                                                </div>
-                                            </div>
-                                            <div className={cx('body')}>
-                                                <h3 className={cx('title')}>
-                                                    {item.fullName}
-                                                </h3>
-                                                <p className={cx('desc')}>
-                                                    Hồ sơ
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </Link>
+                                    <ArtistCard data={item} />
                                 </li>
                             ))}
                         </ul>
                     </div>
                 )}
             </div>
+            {isLoading && <Loading isFitDashboardLayoutContent />}
         </div>
     );
 };

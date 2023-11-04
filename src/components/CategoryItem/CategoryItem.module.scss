@@ -24,7 +24,8 @@
 }
 
 .thumb {
-    position: relative;
+    position: absolute;
+    bottom: 0;
     width: 50%;
     height: 50%;
     box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2);

@@ -139,6 +139,13 @@
                     overflow-y: scroll;
                 }
             }
+
+            .error-message {
+                margin: 12px 0;
+                width: 100%;
+                font-size: 14px;
+                color: red;
+            }
         }
     }
 }

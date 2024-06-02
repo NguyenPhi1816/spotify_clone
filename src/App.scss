@@ -1,0 +1,162 @@
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSp-Bold-fe1cfc14b7498b187c78fa72fb72d148.woff2')
+        format('woff2');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'CircularSp';
+    src: url('./assets/fonts/CircularSp-Book-4eaffdf96f4c6f984686e93d5d9cb325.woff2')
+        format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'CircularSpTitle';
+    src: url('./assets/fonts/CircularSpTitle-Black-3f9afb402080d53345ca1850226ca724.woff2')
+        format('woff2');
+    font-weight: 400;
+}
+
+@font-face {
+    font-family: 'CircularSpTitle';
+    src: url('./assets/fonts/CircularSpTitle-Tall-Bold-69995af8079e90f1d15130df13ad0c60.woff2')
+        format('woff2');
+    font-weight: 600;
+}
+
+@font-face {
+    font-family: 'CircularSpTitle';
+    src: url('./assets/fonts/CircularSpTitle-Bold-2fbf72b606d7f0b0f771ea4956a8b4d6.woff2')
+        format('woff2');
+    font-weight: 700;
+}
+
+@font-face {
+    font-family: 'Spoticon';
+    src: url('./assets/fonts/spoticon_regular_2.d728648c.woff2') format('woff2');
+    font-weight: 400;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --text-black: #000000;
+    --text-white: #ffffff;
+    --text-grey: #a7a7a7;
+
+    --text-green-base: #1ed760;
+
+    --background-black: #000000;
+    --background-base: #121212;
+    --background-grey: #242424;
+    --background-green-base: #1ed760;
+    --background-white: #ffffff;
+
+    // status
+    --error: #dc3545;
+    --success: #1ed760;
+    --infor: #ffffff;
+
+    --font-family: 'CircularSp', sans-serif;
+    --font-family-title: 'CircularSpTitle', sans-serif;
+
+    --panel-gap: 8px;
+    --border-radius: 8px;
+    --sidebar-width: 353px;
+    --navbar-height: 64px;
+
+    --skeleton-base-color: #242424;
+    --skeleton-highlight-color: #444;
+}
+
+html {
+    font-size: 62.5%;
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    color: var(--text-white);
+    background-color: var(--background-black);
+}
+
+a {
+    display: block;
+    text-decoration: none;
+    color: var(--text-white);
+}
+
+button {
+    font-family: var(--font-family);
+    font-weight: 400;
+    font-size: 1.6rem;
+    line-height: 1.5;
+    letter-spacing: 1px;
+    border: none;
+}
+
+//scrollbar
+html *::-webkit-scrollbar {
+    border-radius: 0;
+    width: 4px;
+    height: 4px;
+}
+
+html *::-webkit-scrollbar-thumb {
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.15);
+}
+
+html *::-webkit-scrollbar-track {
+    border-radius: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+
+input[type='range'] {
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 5px;
+    background-image: linear-gradient(
+        var(--background-white),
+        var(--background-white)
+    );
+    background-repeat: no-repeat;
+
+    &:hover {
+        background-image: linear-gradient(
+            var(--background-green-base),
+            var(--background-green-base)
+        );
+
+        &::-webkit-slider-thumb {
+            display: block;
+        }
+    }
+}
+
+input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--text-white);
+    display: none;
+}
+
+input[type='range']::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    box-shadow: none;
+    border: none;
+    background: transparent;
+}

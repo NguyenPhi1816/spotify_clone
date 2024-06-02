@@ -1,0 +1,58 @@
+.container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 9998;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal {
+    position: relative;
+    padding: 16px;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--background-grey);
+    z-index: 9999;
+    border-radius: 4px;
+}
+
+.icon-container {
+    display: flex;
+    width: 64px;
+    height: 64px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: var(--background-grey);
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.icon {
+    font-size: 56px;
+}
+
+.title {
+    margin: 32px 0;
+}
+
+.message {
+    text-align: center;
+}
+
+.button {
+    margin: 32px 0 0;
+    padding: 8px 0;
+    width: 100%;
+    border-radius: 4px;
+}

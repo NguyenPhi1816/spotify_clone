@@ -6,7 +6,7 @@ import SidebarListItem from '../SidebarListItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { type, useAppContext } from '../../Context/Context';
+import { type, useAppContext } from '../../context/Context';
 import { getFollowingPlaylist } from '../../services/userServices';
 import Loading from '../Loading';
 import { getPlaylistById } from '../../services/playlistServices';

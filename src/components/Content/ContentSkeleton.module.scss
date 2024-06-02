@@ -1,0 +1,38 @@
+.skeleton {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #dddddd;
+    padding-top: 10px;
+    opacity: 0.5;
+    @keyframes animate-row{
+      0%{
+        background-position: -500px 0;
+        opacity: 0;
+      }
+      100%{
+        background-position: 0 0;
+        opacity: 1;
+      }
+    }
+    .element {
+      height: 1em;
+      margin-top: 10px;
+      position: relative;
+      animation: animate-row 1100ms linear infinite;
+      
+      &#x26;amp;:after { 
+        position: absolute;
+        display: block;
+        content: &#x27;&#x27;;
+        right: 0;
+        bottom: 0;
+        top: 0;
+        background-color: white;
+      }
+      $elements: 3;
+      @for $i from 0 to $elements {
+        &#x26;amp;:nth-child(#{$i + 1}):after {
+          width: calc(#{10% * ($i+1)});
+        }
+      }
+    }
+  }

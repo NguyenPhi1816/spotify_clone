@@ -3,7 +3,11 @@ import styles from './FavButton.module.scss';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
-import { type, useAppContext } from '../../context/Context';
+import { useAuthContext } from '../../context/AuthContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 
 const cx = classNames.bind(styles);
 
@@ -13,15 +17,16 @@ const FavButton = ({
     onClick = () => {},
     isActive = false,
 }) => {
-    const { state, dispatch } = useAppContext();
+    const { state: authState } = useAuthContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const handleClick = (e) => {
         e.preventDefault();
-        if (state.authData !== null) {
+        if (authState.authData !== null) {
             onClick();
         } else {
-            dispatch({
-                type: type.SHOW_AUTH_DIALOG,
+            dialogDispatch({
+                type: dialogContextTypes.SHOW_AUTH_DIALOG,
                 message: {
                     title: '',
                     message:

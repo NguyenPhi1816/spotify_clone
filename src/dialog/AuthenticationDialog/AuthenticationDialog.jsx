@@ -5,15 +5,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTimes } from '@fortawesome/free-solid-svg-icons';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
-import { type, useAppContext } from '../../context/Context';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 
 const cx = classNames.bind(styles);
 
 const AuthenticationDialog = ({ message }) => {
-    const { dispatch } = useAppContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const handleClose = () => {
-        dispatch({ type: type.HIDE_AUTH_DIALOG });
+        dialogDispatch({ type: dialogContextTypes.HIDE_AUTH_DIALOG });
     };
 
     return createPortal(

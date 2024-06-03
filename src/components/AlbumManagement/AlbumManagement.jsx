@@ -10,8 +10,6 @@ import AddAlbumModal from '../AddAlbumModal';
 import Loading from '../Loading';
 import { createAlbum, getAlbumById } from '../../services/albumServices';
 
-import { useAppContext } from '../../context/Context';
-
 const cx = classNames.bind(styles);
 
 const AlbumManagement = () => {

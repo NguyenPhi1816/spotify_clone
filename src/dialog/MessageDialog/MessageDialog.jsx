@@ -8,8 +8,10 @@ import {
     faCircleExclamation,
     faCircleInfo,
 } from '@fortawesome/free-solid-svg-icons';
-import { useAppContext } from '../../context/Context';
-import { type as contextType } from '../../context/Context';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 
 const cx = classNames.bind(styles);
 
@@ -20,7 +22,7 @@ export const MessageType = {
 };
 
 const MessageDialog = ({ title, message, type }) => {
-    const { dispatch } = useAppContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
     const [themeColor, setThemeColor] = useState('');
     const [icon, setIcon] = useState(null);
 
@@ -45,7 +47,7 @@ const MessageDialog = ({ title, message, type }) => {
     }, [type]);
 
     const handleClose = () => {
-        dispatch({ type: contextType.HIDE_MESSAGE_DIALOG });
+        dialogDispatch({ type: dialogContextTypes.HIDE_MESSAGE_DIALOG });
     };
 
     return createPortal(

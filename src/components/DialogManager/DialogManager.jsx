@@ -1,22 +1,22 @@
-import { useAppContext } from '../../context/Context';
+import { useDialogContext } from '../../context/DialogContext';
 import AuthenticationDialog from '../../dialog/AuthenticationDialog/AuthenticationDialog';
 import MessageDialog from '../../dialog/MessageDialog';
 import PropTypes from 'prop-types';
 
 const DialogManager = ({ children }) => {
-    const { state } = useAppContext();
+    const { state: dialogState } = useDialogContext();
 
     return (
         <>
-            {state.isShowMessageDialog && (
+            {dialogState.isShowMessageDialog && (
                 <MessageDialog
-                    title={state.message.title}
-                    message={state.message.message}
-                    type={state.message.type}
+                    title={dialogState.message.title}
+                    message={dialogState.message.message}
+                    type={dialogState.message.type}
                 />
             )}
-            {state.isShowAuthDialog && (
-                <AuthenticationDialog message={state.message.message} />
+            {dialogState.isShowAuthDialog && (
+                <AuthenticationDialog message={dialogState.message.message} />
             )}
             {children}
         </>

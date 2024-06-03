@@ -9,19 +9,27 @@ import { faClock } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getPlaylistById } from '../../services/playlistServices';
 import Loading from '../Loading';
-import { type, useAppContext } from '../../context/Context';
 import {
     addFavoritePlaylist,
-    getFollowingPlaylist,
     removeFavoritePlaylist,
 } from '../../services/userServices';
+import { useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
 const Playlist = () => {
+    const { state: authState } = useAuthContext();
+    const { state: userDataState, dispatch: userDataDispatch } =
+        useUserDataContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
+
     const { id } = useParams();
     const location = useLocation();
-    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [isPlaying, setIsPlaying] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -52,57 +60,61 @@ const Playlist = () => {
     };
 
     const handlePlayList = () => {
-        if (state.currentPlayingPath !== location.pathname) {
+        if (songState.currentPlayingPath !== location.pathname) {
             console.log('load');
-            dispatch({
-                type: type.LOAD_SONG,
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: location.pathname,
                 currentPlayingList: data.songs,
                 currentPlayingSongIndex: 0,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: type.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: type.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     const hanldeLikePlaylist = () => {
         if (!isFavPlaylist) {
-            addFavoritePlaylist(state.authData.user.id, id).then((res) => {
+            addFavoritePlaylist(authState.authData.user.id, id).then((res) => {
                 console.log(res);
-                dispatch({
-                    type: type.SET_FAV_PLAYLISTS,
+                userDataDispatch({
+                    type: userDataContextTypes.SET_FAV_PLAYLISTS,
                     playlists: res.data,
                 });
                 setIsFavPlaylist(true);
             });
         } else {
-            removeFavoritePlaylist(state.authData.user.id, id).then((res) => {
-                console.log(res);
-                dispatch({
-                    type: type.SET_FAV_PLAYLISTS,
-                    playlists: res.data,
-                });
-                setIsFavPlaylist(false);
-            });
+            removeFavoritePlaylist(authState.authData.user.id, id).then(
+                (res) => {
+                    console.log(res);
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_FAV_PLAYLISTS,
+                        playlists: res.data,
+                    });
+                    setIsFavPlaylist(false);
+                },
+            );
         }
     };
 
     useEffect(() => {
-        if (state.currentPlayingPath === location.pathname) {
-            setIsPlaying(state.isPlaying);
+        if (songState.currentPlayingPath === location.pathname) {
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }
     });
 
     useEffect(() => {
-        const playlist = state.favPlaylists.filter((item) => item.id == id);
+        const playlist = userDataState.favPlaylists.filter(
+            (item) => item.id == id,
+        );
         setIsFavPlaylist(playlist.length > 0);
-    }, [state.favPlaylists]);
+    }, [userDataState.favPlaylists]);
 
     return (
         <div className={cx('container')}>

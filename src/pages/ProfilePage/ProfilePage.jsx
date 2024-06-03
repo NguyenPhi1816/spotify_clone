@@ -1,25 +1,34 @@
 import classNames from 'classnames/bind';
 import styles from './ProfilePage.module.scss';
 import { Link, useNavigate } from 'react-router-dom';
-import { useEffect, useState } from 'react';
-import { type, useAppContext } from '../../context/Context';
+import { useState } from 'react';
 import HeadlessTippy from '../../components/HeadlessTippy';
 import Button from '../../components/Button';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { removeAuthCookie } from '../../cookies/removeCookie';
+import { authContextTypes, useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
 
 const cx = classNames.bind(styles);
 
 const ProfilePage = () => {
+    const { dispatch: authDispatch } = useAuthContext();
+    const { dispatch: userDataDispatch } = useUserDataContext();
+    const { dispatch: songDispatch } = useSongContext();
+
     const navigate = useNavigate();
-    const { dispatch } = useAppContext();
     const [show, setShow] = useState(false);
 
     const handleShowToolTip = () => setShow((prev) => !prev);
 
     const handleLogout = () => {
-        dispatch({ type: type.LOGOUT });
+        authDispatch({ type: authContextTypes.LOGOUT });
+        userDataDispatch({ type: userDataContextTypes.CLEAR_USER_DATA });
+        songDispatch({ type: songContextTypes.CLEAR_SONG });
         removeAuthCookie();
         navigate('/login');
     };

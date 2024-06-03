@@ -17,8 +17,8 @@ import {
 } from '@fortawesome/free-solid-svg-icons';
 import { useState } from 'react';
 import { useEffect } from 'react';
-import { type, useAppContext } from '../../context/Context';
 import { Link } from 'react-router-dom';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -33,34 +33,34 @@ const PlaybarAuth = () => {
     const LOW_VALUE = 0.7;
     const HIGH_VALUE = 1;
 
-    const { state, dispatch } = useAppContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
 
-    const [playStatus, setPlayStatus] = useState(() => state.isPlaying);
-    const [volumeValue, setVolumeValue] = useState(state.volume);
+    const [playStatus, setPlayStatus] = useState(() => songState.isPlaying);
+    const [volumeValue, setVolumeValue] = useState(songState.volume);
     const [volumeIcon, setVolumeIcon] = useState(HIGH);
     const [durationValue, setDurationValue] = useState(0);
     const [currentPlayingPath, setCurrentPlayingPath] = useState(
-        state.currentPlayingPath,
+        songState.currentPlayingPath,
     );
     const [currentPlayingList, setCurrentPlayingList] = useState(
-        state.currentPlayingList,
+        songState.currentPlayingList,
     );
     const [currentPlayingSongIndex, setCurrentPlayingSongIndex] = useState(
-        state.currentPlayingSongIndex,
+        songState.currentPlayingSongIndex,
     );
     const [currentPlayingSong, setCurrentPlayingSong] = useState(
-        state.currentPlayingSong,
+        songState.currentPlayingSong,
     );
     const [currentTime, setCurrentTime] = useState('--:--');
     const [remainTime, setRemainTime] = useState('--:--');
-    const [isRandom, setIsRandom] = useState(state.isRandom);
-    const [isLoop, setIsLoop] = useState(state.isLoop);
+    const [isRandom, setIsRandom] = useState(songState.isRandom);
+    const [isLoop, setIsLoop] = useState(songState.isLoop);
 
     const handleTogglePlayPauseSong = () => {
         if (playStatus) {
-            dispatch({ type: type.PAUSE_SONG });
+            songDispatch({ type: songContextTypes.PAUSE_SONG });
         } else {
-            dispatch({ type: type.PLAY_SONG });
+            songDispatch({ type: songContextTypes.PLAY_SONG });
         }
         setPlayStatus((prev) => !prev);
     };
@@ -95,10 +95,13 @@ const PlaybarAuth = () => {
 
     const handlePlayingRandomSong = () => {
         const newIndex = Math.floor(Math.random() * currentPlayingList.length);
-        dispatch({ type: type.PAUSE_SONG });
-        dispatch({ type: type.SET_CURRENT_SONG_INDEX, index: newIndex });
+        songDispatch({ type: songContextTypes.PAUSE_SONG });
+        songDispatch({
+            type: songContextTypes.SET_CURRENT_SONG_INDEX,
+            index: newIndex,
+        });
         setTimeout(() => {
-            dispatch({ type: type.PLAY_SONG });
+            songDispatch({ type: songContextTypes.PLAY_SONG });
         }, 1000);
     };
 
@@ -106,11 +109,14 @@ const PlaybarAuth = () => {
         if (isRandom) {
             handlePlayingRandomSong();
         } else if (currentPlayingSongIndex + 1 < currentPlayingList.length) {
-            dispatch({ type: type.PAUSE_SONG });
-            dispatch({ type: type.NEXT_SONG });
+            songDispatch({ type: songContextTypes.PAUSE_SONG });
+            songDispatch({ type: songContextTypes.NEXT_SONG });
         } else if (isLoop) {
-            dispatch({ type: type.PAUSE_SONG });
-            dispatch({ type: type.SET_CURRENT_SONG_INDEX, index: 0 });
+            songDispatch({ type: songContextTypes.PAUSE_SONG });
+            songDispatch({
+                type: songContextTypes.SET_CURRENT_SONG_INDEX,
+                index: 0,
+            });
         }
     };
 
@@ -118,30 +124,33 @@ const PlaybarAuth = () => {
         if (isRandom) {
             handlePlayingRandomSong();
         } else if (isLoop) {
-            dispatch({ type: type.PAUSE_SONG });
-            dispatch({
-                type: type.SET_CURRENT_SONG_INDEX,
+            songDispatch({ type: songContextTypes.PAUSE_SONG });
+            songDispatch({
+                type: songContextTypes.SET_CURRENT_SONG_INDEX,
                 index: currentPlayingList.length - 1,
             });
         } else if (currentPlayingSongIndex - 1 >= 0) {
-            dispatch({ type: type.PAUSE_SONG });
-            dispatch({ type: type.PREV_SONG });
+            songDispatch({ type: songContextTypes.PAUSE_SONG });
+            songDispatch({ type: songContextTypes.PREV_SONG });
         }
     };
 
     const handleRandomSong = () => {
-        dispatch({ type: type.SET_RANDOM });
+        songDispatch({ type: songContextTypes.SET_RANDOM });
         setIsRandom((prev) => !prev);
     };
 
     const handleLoopSong = () => {
-        dispatch({ type: type.SET_LOOP });
+        songDispatch({ type: songContextTypes.SET_LOOP });
         setIsLoop((prev) => !prev);
     };
 
     useEffect(() => {
         loadIcon(volumeValue);
-        dispatch({ type: type.SET_VOLUME, volume: volumeValue });
+        songDispatch({
+            type: songContextTypes.SET_VOLUME,
+            volume: volumeValue,
+        });
         if (currentPlayingSong !== null) {
             currentPlayingSong.volume = volumeValue;
         }
@@ -154,15 +163,16 @@ const PlaybarAuth = () => {
 
         const handlePlaySong = (song) => {
             song.id = Math.random();
-            dispatch({
-                type: type.SET_SONG,
-                songId: state.currentPlayingList[state.currentPlayingSongIndex]
-                    .id,
+            songDispatch({
+                type: songContextTypes.SET_SONG,
+                songId: songState.currentPlayingList[
+                    songState.currentPlayingSongIndex
+                ].id,
                 currentPlayingSong: song,
             });
             setCurrentPlayingSong(song);
             setTimeout(() => {
-                dispatch({ type: type.PLAY_SONG });
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             }, 1000);
         };
 
@@ -172,39 +182,43 @@ const PlaybarAuth = () => {
         };
 
         if (
-            state.currentPlayingPath !== null &&
-            currentPlayingPath !== state.currentPlayingPath
+            songState.currentPlayingPath !== null &&
+            currentPlayingPath !== songState.currentPlayingPath
         ) {
-            setCurrentPlayingPath(state.currentPlayingPath);
+            setCurrentPlayingPath(songState.currentPlayingPath);
             isChanged = true;
         }
 
         if (
-            state.currentPlayingList !== null &&
-            currentPlayingList !== state.currentPlayingList
+            songState.currentPlayingList !== null &&
+            currentPlayingList !== songState.currentPlayingList
         ) {
-            setCurrentPlayingList(state.currentPlayingList);
+            setCurrentPlayingList(songState.currentPlayingList);
             isChanged = true;
         }
 
         if (
-            state.currentPlayingSongIndex !== null &&
-            currentPlayingSongIndex !== state.currentPlayingSongIndex
+            songState.currentPlayingSongIndex !== null &&
+            currentPlayingSongIndex !== songState.currentPlayingSongIndex
         ) {
-            setCurrentPlayingSongIndex(state.currentPlayingSongIndex);
+            setCurrentPlayingSongIndex(songState.currentPlayingSongIndex);
             isChanged = true;
         }
 
         if (isChanged) {
-            const prevSong = state.currentPlayingSong;
+            const prevSong = songState.currentPlayingSong;
             if (prevSong !== null) {
                 prevSong.pause();
-                dispatch({ type: type.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
-            const audioPath =
-                state.currentPlayingList[state.currentPlayingSongIndex]
-                    .audioPath;
-            song = new Audio(audioPath);
+            const _currentPlayingSong =
+                songState.currentPlayingList[songState.currentPlayingSongIndex];
+            if (_currentPlayingSong) {
+                const audioPath = _currentPlayingSong.audioPath;
+                if (audioPath) {
+                    song = new Audio(audioPath);
+                }
+            }
         }
 
         if (song !== null && !isCanPlayThrough)
@@ -220,20 +234,20 @@ const PlaybarAuth = () => {
             }
         };
     }, [
-        state.currentPlayingPath,
-        state.currentPlayingList,
-        state.currentPlayingSongIndex,
+        songState.currentPlayingPath,
+        songState.currentPlayingList,
+        songState.currentPlayingSongIndex,
     ]);
 
     useEffect(() => {
-        if (state.isPlaying && currentPlayingSong !== null) {
+        if (songState.isPlaying && currentPlayingSong !== null) {
             currentPlayingSong.play();
             setPlayStatus(true);
         } else if (currentPlayingSong !== null) {
             currentPlayingSong.pause();
             setPlayStatus(false);
         }
-    }, [state.isPlaying]);
+    }, [songState.isPlaying]);
 
     useEffect(() => {
         if (currentPlayingSong !== null) {
@@ -337,8 +351,9 @@ const PlaybarAuth = () => {
                                 </Link>
                             )}
                             <div className={cx('links')}>
-                                {currentPlayingList[currentPlayingSongIndex]
-                                    .users &&
+                                {currentPlayingList[currentPlayingSongIndex] &&
+                                    currentPlayingList[currentPlayingSongIndex]
+                                        .users &&
                                     currentPlayingList[
                                         currentPlayingSongIndex
                                     ].users.map((user) => (

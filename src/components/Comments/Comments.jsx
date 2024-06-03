@@ -3,14 +3,14 @@ import styles from './Comments.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeart } from '@fortawesome/free-solid-svg-icons';
 import Button from '../Button';
-import { useAppContext } from '../../context/Context';
 import { useEffect, useState } from 'react';
 import { uploadComment } from '../../services/reviewServices';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const Comments = ({ data = [], songId }) => {
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
     const [comment, setComment] = useState('');
     const [commentList, setCommentList] = useState([]);
 
@@ -48,7 +48,7 @@ const Comments = ({ data = [], songId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await uploadComment(state.authData.user.id, songId, comment).then(
+        await uploadComment(authState.authData.user.id, songId, comment).then(
             (res) => {
                 const newCommentList = [...commentList, res.data];
                 setCommentList(newCommentList);
@@ -63,7 +63,7 @@ const Comments = ({ data = [], songId }) => {
     return (
         <div className={cx('container')}>
             <h3>Bình luận</h3>
-            {state.isAuthenticated && (
+            {authState.isAuthenticated && (
                 <div className={cx('user-section')}>
                     <span className={cx('author')}>
                         <img

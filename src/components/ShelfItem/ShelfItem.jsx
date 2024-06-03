@@ -2,14 +2,13 @@ import classNames from 'classnames/bind';
 import styles from './ShelfItem.module.scss';
 
 import { useEffect, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import PlayButton from '../PlayButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPen } from '@fortawesome/free-solid-svg-icons';
-import { useAppContext } from '../../context/Context';
 import { getPlaylistById } from '../../services/playlistServices';
-import { type as contextType } from '../../context/Context';
 import { getAlbumById } from '../../services/albumServices';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -17,7 +16,8 @@ function ShelfItem({ type, shelfItemData = {}, edit = false }) {
     const PLAYLIST = 'playlist';
     const ALBUM = 'album';
 
-    const { state, dispatch } = useAppContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
+
     const [data, setData] = useState({});
     const [isPlaying, setIsPlaying] = useState(false);
 
@@ -32,25 +32,25 @@ function ShelfItem({ type, shelfItemData = {}, edit = false }) {
         if (type === ALBUM)
             list = await getAlbumById(data.id).then((res) => res.data.songs);
 
-        if (state.currentPlayingPath !== `/${type}/${data.id}`) {
-            dispatch({
-                type: contextType.LOAD_SONG,
+        if (songState.currentPlayingPath !== `/${type}/${data.id}`) {
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: `/${type}/${data.id}`,
                 currentPlayingList: list,
                 currentPlayingSongIndex: 0,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: contextType.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: contextType.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     useEffect(() => {
-        if (state.currentPlayingPath === `/${type}/${data.id}`) {
-            setIsPlaying(state.isPlaying);
+        if (songState.currentPlayingPath === `/${type}/${data.id}`) {
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }

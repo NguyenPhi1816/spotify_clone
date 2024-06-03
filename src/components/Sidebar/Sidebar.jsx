@@ -17,9 +17,9 @@ import {
     faPlus,
 } from '@fortawesome/free-solid-svg-icons';
 import HeadlessTippy from '../HeadlessTippy';
-import { useAppContext } from '../../context/Context';
 import UnAuthSidebarList from '../SidebarList/UnAuthSidebarList';
 import AuthSidebarList from '../SidebarList/AuthSidebarList';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
@@ -27,7 +27,7 @@ function Sidebar() {
     const location = useLocation();
     const currentPath = location.pathname;
 
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
 
     const [show, setShow] = useState(false);
 
@@ -141,7 +141,7 @@ function Sidebar() {
                     </div>
 
                     <div className={cx('body-list')}>
-                        {!state.isAuthenticated ? (
+                        {!authState.isAuthenticated ? (
                             <UnAuthSidebarList />
                         ) : (
                             <AuthSidebarList />

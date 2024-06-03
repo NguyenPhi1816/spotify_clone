@@ -14,8 +14,8 @@ import { getAlbumById } from '../../services/albumServices';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import Loading from '../Loading';
 
-import { type, useAppContext } from '../../context/Context';
 import ShelfItem from '../ShelfItem';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -23,9 +23,10 @@ const AlbumSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
+    const { state: songState, dispatch: songDispatch } = useSongContext();
+
     const { id } = useParams();
     const location = useLocation();
-    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [artist, setArtist] = useState({});
     const [albums, setAlbums] = useState([]);
@@ -63,26 +64,26 @@ const AlbumSection = () => {
     };
 
     const handlePlayAlbum = () => {
-        if (state.currentPlayingPath !== location.pathname) {
+        if (songState.currentPlayingPath !== location.pathname) {
             console.log('load');
-            dispatch({
-                type: type.LOAD_SONG,
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: location.pathname,
                 currentPlayingList: data.songs,
                 currentPlayingSongIndex: 0,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: type.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: type.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     useEffect(() => {
-        if (state.currentPlayingPath === location.pathname) {
-            setIsPlaying(state.isPlaying);
+        if (songState.currentPlayingPath === location.pathname) {
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }

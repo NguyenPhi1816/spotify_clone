@@ -19,13 +19,18 @@ import {
     getUserById,
 } from '../../services/userServices';
 import Loading from '../Loading';
-import { type, useAppContext } from '../../context/Context';
 import {
     addFavArtist,
     getFavArtist,
     removeFavArtist,
 } from '../../services/followerServices';
 import ShelfItem from '../ShelfItem';
+import { useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -33,9 +38,13 @@ const ArtistSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
+    const { state: authState } = useAuthContext();
+    const { state: userDataState, dispatch: userDataDispatch } =
+        useUserDataContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
+
     const { id } = useParams();
     const location = useLocation();
-    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [albums, setAlbums] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(5);
@@ -67,41 +76,41 @@ const ArtistSection = () => {
     };
 
     const handlePlayList = () => {
-        if (state.currentPlayingPath !== location.pathname) {
+        if (songState.currentPlayingPath !== location.pathname) {
             console.log('load');
-            dispatch({
-                type: type.LOAD_SONG,
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: location.pathname,
                 currentPlayingList: data.songs,
                 currentPlayingSongIndex: 0,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: type.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: type.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     const hanldeLikeArtist = async () => {
         if (!isFavArtist) {
-            await addFavArtist(state.authData.user.id, id);
+            await addFavArtist(authState.authData.user.id, id);
             setTimeout(() => {
-                getFavArtist(state.authData.user.id).then((res) => {
-                    dispatch({
-                        type: type.SET_FAV_ARTISTS,
+                getFavArtist(authState.authData.user.id).then((res) => {
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_FAV_ARTISTS,
                         artists: res.data,
                     });
                     setIsFavArtist(true);
                 });
             }, 500);
         } else {
-            await removeFavArtist(state.authData.user.id, id);
+            await removeFavArtist(authState.authData.user.id, id);
             setTimeout(() => {
-                getFavArtist(state.authData.user.id).then((res) => {
-                    dispatch({
-                        type: type.SET_FAV_ARTISTS,
+                getFavArtist(authState.authData.user.id).then((res) => {
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_FAV_ARTISTS,
                         artists: res.data,
                     });
                     setIsFavArtist(false);
@@ -111,17 +120,17 @@ const ArtistSection = () => {
     };
 
     useEffect(() => {
-        if (state.currentPlayingPath === location.pathname) {
-            setIsPlaying(state.isPlaying);
+        if (songState.currentPlayingPath === location.pathname) {
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }
     });
 
     useEffect(() => {
-        const artist = state.favArtists.filter((item) => item.id == id);
+        const artist = userDataState.favArtists.filter((item) => item.id == id);
         setIsFavArtist(artist.length > 0);
-    }, [state.favPlaylists]);
+    }, [userDataState.favPlaylists]);
 
     return (
         <div className={cx('container')}>

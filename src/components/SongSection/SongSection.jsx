@@ -10,7 +10,6 @@ import Button from '../Button';
 import Song from '../Song';
 import Shelf from '../Shelf';
 import { useRef } from 'react';
-import { type, useAppContext } from '../../context/Context';
 import { getAlbumById } from '../../services/albumServices';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import Comments from '../Comments';
@@ -20,6 +19,12 @@ import {
     removeSongFromFavPlaylist,
 } from '../../services/playlistServices';
 import ShelfItem from '../ShelfItem';
+import { useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -27,9 +32,13 @@ const SongSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
+    const { state: authState } = useAuthContext();
+    const { state: userDataState, dispatch: userDataDispatch } =
+        useUserDataContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
+
     const { id } = useParams();
     const lyricContainerRef = useRef();
-    const { state, dispatch } = useAppContext();
     const [data, setData] = useState({});
     const [albums, setAlbums] = useState([]);
     const [songs, setSongs] = useState([]);
@@ -70,7 +79,7 @@ const SongSection = () => {
     }, [mainArtist.id]);
 
     useEffect(() => {
-        if (state.isAuthenticated)
+        if (authState.isAuthenticated)
             lyricContainerRef.current.innerHTML =
                 '<h3>Lời bài hát</h3>' + data.lyric;
     }, [data.lyric]);
@@ -82,38 +91,42 @@ const SongSection = () => {
     }, [isShowMore]);
 
     useEffect(() => {
-        if (state.likedSongsPlaylist.songs) {
-            const [song] = state.likedSongsPlaylist.songs.filter(
+        if (userDataState.likedSongsPlaylist.songs) {
+            const [song] = userDataState.likedSongsPlaylist.songs.filter(
                 (item) => item.id == id,
             );
             if (!!song) {
                 setIsFavSong(true);
             }
         }
-    }, [state.likedSongsPlaylist]);
+    }, [userDataState.likedSongsPlaylist]);
 
     const handleLikeSong = () => {
         if (!isFavSong) {
-            addSongToFavPlaylist(state.authData.user.id, id).then((res) => {
-                dispatch({
-                    type: type.SET_LIKED_SONGS_PLAYLIST,
+            addSongToFavPlaylist(authState.authData.user.id, id).then((res) => {
+                userDataDispatch({
+                    type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                     playlist: res.data,
                 });
                 setIsFavSong(true);
             });
         } else {
-            removeSongFromFavPlaylist(state.authData.user.id, id).then(
+            removeSongFromFavPlaylist(authState.authData.user.id, id).then(
                 (res) => {
-                    if (res.status == 200 && state.likedSongsPlaylist.songs) {
-                        const new_songs = state.likedSongsPlaylist.songs.filter(
-                            (item) => item.id != id,
-                        );
+                    if (
+                        res.status == 200 &&
+                        userDataState.likedSongsPlaylist.songs
+                    ) {
+                        const new_songs =
+                            userDataState.likedSongsPlaylist.songs.filter(
+                                (item) => item.id != id,
+                            );
                         const new_playlist = {
-                            ...state.likedSongsPlaylist,
+                            ...userDataState.likedSongsPlaylist,
                             songs: new_songs,
                         };
-                        dispatch({
-                            type: type.SET_LIKED_SONGS_PLAYLIST,
+                        userDataDispatch({
+                            type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                             playlist: new_playlist,
                         });
                         setIsFavSong(false);
@@ -128,26 +141,26 @@ const SongSection = () => {
     };
 
     const handlePlayList = () => {
-        if (state.currentPlayingPath !== location.pathname) {
+        if (songState.currentPlayingPath !== location.pathname) {
             console.log('load');
-            dispatch({
-                type: type.LOAD_SONG,
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: location.pathname,
                 currentPlayingList: [data],
                 currentPlayingSongIndex: 0,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: type.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: type.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     useEffect(() => {
-        if (state.currentPlayingPath === location.pathname) {
-            setIsPlaying(state.isPlaying);
+        if (songState.currentPlayingPath === location.pathname) {
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }
@@ -226,14 +239,16 @@ const SongSection = () => {
                 <div
                     className={cx('lyric-artist')}
                     style={{
-                        flexDirection: state.isAuthenticated ? 'row' : 'column',
+                        flexDirection: authState.isAuthenticated
+                            ? 'row'
+                            : 'column',
                     }}
                 >
                     <div
                         className={cx('lyrics-container')}
                         ref={lyricContainerRef}
                     >
-                        {!state.isAuthenticated && (
+                        {!authState.isAuthenticated && (
                             <div className={cx('activation-trigger')}>
                                 <p>
                                     Đăng nhập để xem lời bài hát và nghe toàn bộ

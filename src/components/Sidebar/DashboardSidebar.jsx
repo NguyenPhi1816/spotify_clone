@@ -7,12 +7,12 @@ import {
     faHouse,
     faMusic,
 } from '@fortawesome/free-solid-svg-icons';
-import { useAppContext } from '../../context/Context';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const DashboardSidebar = () => {
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
     const currentPath = useLocation().pathname;
 
     return (
@@ -34,17 +34,18 @@ const DashboardSidebar = () => {
                             <div>
                                 <img
                                     src={
-                                        state.authData &&
-                                        state.authData.user.photoImagePath
+                                        authState.authData &&
+                                        authState.authData.user.photoImagePath
                                     }
                                     alt={
-                                        state.authData &&
-                                        state.authData.user.fullName
+                                        authState.authData &&
+                                        authState.authData.user.fullName
                                     }
                                 />
                             </div>
                             <h2>
-                                {state.authData && state.authData.user.fullName}
+                                {authState.authData &&
+                                    authState.authData.user.fullName}
                             </h2>
                         </div>
                     </li>
@@ -65,7 +66,7 @@ const DashboardSidebar = () => {
                     >
                         <Link
                             to={`/dashboard/${
-                                state.authData && state.authData.user.id
+                                authState.authData && authState.authData.user.id
                             }`}
                         >
                             <FontAwesomeIcon icon={faChartSimple} />
@@ -79,7 +80,7 @@ const DashboardSidebar = () => {
                     >
                         <Link
                             to={`/management/${
-                                state.authData && state.authData.user.id
+                                authState.authData && authState.authData.user.id
                             }`}
                         >
                             <FontAwesomeIcon icon={faMusic} />

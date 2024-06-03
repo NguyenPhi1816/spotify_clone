@@ -6,11 +6,11 @@ import { useEffect } from 'react';
 import Button from '../Button';
 import Song from '../Song';
 import { useRef } from 'react';
-import { useAppContext } from '../../context/Context';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
 import { getFollowingsByUserId } from '../../services/followingServices';
 import Loading from '../Loading';
 import ArtistCard from '../ArtistCard/ArtistCard';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
@@ -18,7 +18,7 @@ const UserSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
     const ref = useRef();
     const [user, setUser] = useState({});
     const [songs, setSongs] = useState([]);
@@ -57,8 +57,8 @@ const UserSection = () => {
     };
 
     useEffect(() => {
-        if (state.authData) setUser(state.authData.user);
-    }, [state.authData]);
+        if (authState.authData) setUser(authState.authData.user);
+    }, [authState.authData]);
 
     useLayoutEffect(() => {
         setContainerWidth(ref.current.offsetWidth);

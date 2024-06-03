@@ -2,15 +2,20 @@ import classNames from 'classnames/bind';
 import styles from './Song.module.scss';
 import FavButton from '../FavButton';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis, faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { Link, useLocation } from 'react-router-dom';
-import { Fragment, useEffect, useRef, useState } from 'react';
-import { type, useAppContext } from '../../context/Context';
+import { Fragment, useEffect, useState } from 'react';
 import PlayButton from '../PlayButton';
 import {
     addSongToFavPlaylist,
     removeSongFromFavPlaylist,
 } from '../../services/playlistServices';
+import { useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -24,7 +29,10 @@ const Song = ({
     showCreatedDate = false,
     currentList = [],
 }) => {
-    const { state, dispatch } = useAppContext();
+    const { state: authState } = useAuthContext();
+    const { state: userDataState, dispatch: userDataDispatch } =
+        useUserDataContext();
+    const { state: songState, dispatch: songDispatch } = useSongContext();
 
     const location = useLocation();
     const [isCurrentSong, setIsCurrentSong] = useState(true);
@@ -57,38 +65,38 @@ const Song = ({
     };
 
     const songMatched = () =>
-        state.currentPlayingSongId !== null &&
-        data.id === state.currentPlayingSongId;
+        songState.currentPlayingSongId !== null &&
+        data.id === songState.currentPlayingSongId;
 
     useEffect(() => {
         setIsCurrentSong(() => songMatched());
-    }, [state.currentPlayingSongId]);
+    }, [songState.currentPlayingSongId]);
 
     useEffect(() => {
-        setIsPlaying(state.isPlaying);
-    }, [state.isPlaying]);
+        setIsPlaying(songState.isPlaying);
+    }, [songState.isPlaying]);
 
     const handlePlayList = () => {
         if (!isCurrentSong) {
             console.log('load');
-            dispatch({
-                type: type.LOAD_SONG,
+            songDispatch({
+                type: songContextTypes.LOAD_SONG,
                 currentPlayingPath: location.pathname,
                 currentPlayingList: currentList,
                 currentPlayingSongIndex: index,
             });
         } else {
-            if (!state.isPlaying) {
-                dispatch({ type: type.PLAY_SONG });
+            if (!songState.isPlaying) {
+                songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                dispatch({ type: type.PAUSE_SONG });
+                songContextTypes({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };
 
     useEffect(() => {
         if (isCurrentSong) {
-            setIsPlaying(state.isPlaying);
+            setIsPlaying(songState.isPlaying);
         } else {
             setIsPlaying(false);
         }
@@ -96,42 +104,46 @@ const Song = ({
 
     useEffect(() => {
         if (
-            state.likedSongsPlaylist !== null &&
-            Object.keys(state.likedSongsPlaylist).length > 0
+            userDataState.likedSongsPlaylist &&
+            Object.keys(userDataState.likedSongsPlaylist).length > 0
         ) {
-            const [song] = state.likedSongsPlaylist.songs.filter(
+            const [song] = userDataState.likedSongsPlaylist.songs.filter(
                 (item) => item.id === data.id,
             );
             if (!!song) {
                 setIsFavSong(true);
             }
         }
-    }, [state.likedSongsPlaylist]);
+    }, [userDataState.likedSongsPlaylist]);
 
     const handleLikeSong = () => {
         if (!isFavSong) {
-            addSongToFavPlaylist(state.authData.user.id, data.id).then(
+            addSongToFavPlaylist(authState.authData.user.id, data.id).then(
                 (res) => {
-                    dispatch({
-                        type: type.SET_LIKED_SONGS_PLAYLIST,
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                         playlist: res.data,
                     });
                     setIsFavSong(true);
                 },
             );
         } else {
-            removeSongFromFavPlaylist(state.authData.user.id, data.id).then(
+            removeSongFromFavPlaylist(authState.authData.user.id, data.id).then(
                 (res) => {
-                    if (res.status == 200 && state.likedSongsPlaylist.songs) {
-                        const new_songs = state.likedSongsPlaylist.songs.filter(
-                            (item) => item.id !== data.id,
-                        );
+                    if (
+                        res.status == 200 &&
+                        userDataState.likedSongsPlaylist.songs
+                    ) {
+                        const new_songs =
+                            userDataState.likedSongsPlaylist.songs.filter(
+                                (item) => item.id !== data.id,
+                            );
                         const new_playlist = {
-                            ...state.likedSongsPlaylist,
+                            ...userDataState.likedSongsPlaylist,
                             songs: new_songs,
                         };
-                        dispatch({
-                            type: type.SET_LIKED_SONGS_PLAYLIST,
+                        userDataDispatch({
+                            type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                             playlist: new_playlist,
                         });
                         setIsFavSong(false);

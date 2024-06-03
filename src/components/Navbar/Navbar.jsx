@@ -13,18 +13,25 @@ import Button from '../Button';
 import HeadlessTippy from '../HeadlessTippy';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { type, useAppContext } from '../../context/Context';
 import SearchByEmotion from '../SearchByEmotion';
 import { isArtist } from '../../services/authorizationServices';
 import { removeAuthCookie } from '../../cookies/removeCookie';
 import useDebounce from '../../hooks/useDebounce';
 
 import PropTypes from 'prop-types';
+import { authContextTypes, useAuthContext } from '../../context/AuthContext';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
+import { songContextTypes, useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
 function Navbar({ onSearch, showSearchBar }) {
-    const { state, dispatch } = useAppContext();
+    const { state: authState, dispatch: authDispatch } = useAuthContext();
+    const { dispatch: userDataDispatch } = useUserDataContext();
+    const { dispatch: songDispatch } = useSongContext();
 
     const navigate = useNavigate();
     const [show, setShow] = useState(false);
@@ -38,7 +45,9 @@ function Navbar({ onSearch, showSearchBar }) {
     const handleGoBackward = () => navigate(-1);
 
     const handleLogout = () => {
-        dispatch({ type: type.LOGOUT });
+        authDispatch({ type: authContextTypes.LOGOUT });
+        userDataDispatch({ type: userDataContextTypes.CLEAR_USER_DATA });
+        songDispatch({ type: songContextTypes.CLEAR_SONG });
         removeAuthCookie();
         navigate('/login');
     };
@@ -109,7 +118,7 @@ function Navbar({ onSearch, showSearchBar }) {
                                     </div>
                                 </div>
                             }
-                            show={showModal && !state.isAuthenticated}
+                            show={showModal && !authState.isAuthenticated}
                             setShow={setShowModal}
                         >
                             <Button
@@ -120,20 +129,20 @@ function Navbar({ onSearch, showSearchBar }) {
                         </HeadlessTippy>
                     </div>
                 </div>
-                {state.isAuthenticated ? (
+                {authState.isAuthenticated ? (
                     <HeadlessTippy
                         items={
                             <div className={cx('tippy')}>
-                                {isArtist(state.authData.user.role.id) && (
+                                {isArtist(authState.authData.user.role.id) && (
                                     <Button
-                                        to={`/dashboard/${state.authData.user.id}`}
+                                        to={`/dashboard/${authState.authData.user.id}`}
                                         className={cx('tippy-btn')}
                                         noBackground
                                         content={<p>Dashboard</p>}
                                     />
                                 )}
                                 <Button
-                                    to={`/user/${state.authData.user.id}`}
+                                    to={`/user/${authState.authData.user.id}`}
                                     className={cx('tippy-btn')}
                                     noBackground
                                     content={<p>Hồ sơ</p>}
@@ -181,7 +190,7 @@ function Navbar({ onSearch, showSearchBar }) {
                     </div>
                 )}
             </div>
-            {showModal && state.isAuthenticated && (
+            {showModal && authState.isAuthenticated && (
                 <SearchByEmotion onClose={handleShowModal} />
             )}
         </nav>

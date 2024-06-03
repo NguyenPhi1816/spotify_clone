@@ -2,12 +2,12 @@ import classNames from 'classnames/bind';
 import styles from './SidebarListItem.module.scss';
 
 import { Link } from 'react-router-dom';
-import { useAppContext } from '../../context/Context';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const SidebarListItem = ({ data, type }) => {
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
 
     return (
         <Link to={`/${type}/${data.id}`}>
@@ -29,7 +29,7 @@ const SidebarListItem = ({ data, type }) => {
                         <p className={cx('footer')}>
                             Danh sách phát
                             <span className={cx('dot')}></span>
-                            {state.authData.user.fullName}
+                            {authState.authData.user.fullName}
                         </p>
                     ) : (
                         <p className={cx('footer')}>Nghệ sĩ</p>

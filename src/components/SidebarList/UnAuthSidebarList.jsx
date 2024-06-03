@@ -2,16 +2,19 @@ import classNames from 'classnames/bind';
 import styles from './SidebarList.module.scss';
 import { Fragment } from 'react';
 import Button from '../Button';
-import { type, useAppContext } from '../../context/Context';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 
 const cx = classNames.bind(styles);
 
 const UnAuthSidebarList = () => {
-    const { dispatch } = useAppContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const handleShowAuthDialog = () => {
-        dispatch({
-            type: type.SHOW_AUTH_DIALOG,
+        dialogDispatch({
+            type: dialogContextTypes.SHOW_AUTH_DIALOG,
             message: {
                 title: '',
                 message: 'Vui lòng đăng nhập để sử dụng chức năng bạn nhé',

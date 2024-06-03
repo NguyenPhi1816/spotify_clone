@@ -10,7 +10,6 @@ import {
     uploadSongImage,
 } from '../../services/songServices';
 import { useRef } from 'react';
-import { useAppContext } from '../../context/Context';
 import HeadlessTippy from '../HeadlessTippy';
 import Button from '../Button';
 import ImageUploadModal from '../ImageUploadModal';
@@ -21,11 +20,12 @@ import Loading from '../Loading';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import AddArtistToSong from '../AddArtistToSong/AddArtistToSong';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const SongEditing = () => {
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
 
     const { id } = useParams();
     const songNameRef = useRef();
@@ -93,7 +93,7 @@ const SongEditing = () => {
             Number.parseInt(month),
             Number.parseInt(year),
             data.label,
-            state.authData.user.id,
+            authState.authData.user.id,
         ).then((res) => setData(res.data));
     };
 
@@ -110,7 +110,7 @@ const SongEditing = () => {
             Number.parseInt(month),
             Number.parseInt(year),
             data.label,
-            state.authData.user.id,
+            authState.authData.user.id,
         ).then((res) => setData(res.data));
         setShowLyricsEditor(false);
     };
@@ -127,7 +127,7 @@ const SongEditing = () => {
     }, [id]);
 
     useEffect(() => {
-        if (state.isAuthenticated)
+        if (authState.isAuthenticated)
             lyricContainerRef.current.innerHTML =
                 '<h3>Lời bài hát</h3>' + data.lyric;
     }, [data.lyric]);

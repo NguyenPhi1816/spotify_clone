@@ -12,14 +12,14 @@ import ImageUploadModal from '../ImageUploadModal';
 import AudioUploadModal from '../AudioUploadModal';
 import TextEditor from '../TextEditor';
 
-import { useAppContext } from '../../context/Context';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const AddSongModal = ({ onClose, onSubmit }) => {
     const lyricsRef = useRef();
     const errorMessageRef = useRef();
-    const { state } = useAppContext();
+    const { state: authState } = useAuthContext();
     const [name, setName] = useState('');
     const [genre, setGenre] = useState('POP');
     const [sentiment, setSentiment] = useState('happy');
@@ -97,7 +97,7 @@ const AddSongModal = ({ onClose, onSubmit }) => {
                     month: currentDate.getMonth() + 1,
                     year: currentDate.getFullYear(),
                     label: sentiment,
-                    usersId: state.authData.user.id,
+                    usersId: authState.authData.user.id,
                 };
 
                 onSubmit(data, selectedAudio, selectedImage);

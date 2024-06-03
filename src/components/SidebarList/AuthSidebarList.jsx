@@ -6,83 +6,46 @@ import SidebarListItem from '../SidebarListItem';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { type, useAppContext } from '../../context/Context';
-import { getFollowingPlaylist } from '../../services/userServices';
-import Loading from '../Loading';
 import { getPlaylistById } from '../../services/playlistServices';
 import SidebarListItemSkeleton from '../SidebarListItem/SidebarListItemSkeleton';
-import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
+import {
+    useUserDataContext,
+    userDataContextTypes,
+} from '../../context/UserDataContext';
 
 const cx = classNames.bind(styles);
 
 const AuthSidebarList = () => {
     const PLAYLIST = 'playlist';
     const ARTIST = 'artist';
-    const LIKED_SONGS_PLAYLIST_NAME = 'Liked Songs';
 
-    const { state, dispatch } = useAppContext();
+    const { state: userDataState, dispatch: userDataDispatch } =
+        useUserDataContext();
+
     const [data, setData] = useState({});
-    const [isLoading, setIsLoading] = useState(false);
     const [activeBtn, setActiveBtn] = useState(null);
     const [searchValue, setSearchValue] = useState('');
     const [likedSongsPlaylist, setLikedSongsPlaylist] = useState({});
 
     useEffect(() => {
-        setIsLoading(true);
-        getFollowingPlaylist(state.authData.user.id)
-            .then((res) => {
-                setData(res.data);
-
-                dispatch({
-                    type: type.SET_FAV_PLAYLISTS,
-                    playlists: res.data.playlists,
-                });
-                dispatch({
-                    type: type.SET_FAV_ARTISTS,
-                    artists: res.data.followings,
-                });
-
-                const [_likedSongPlaylist] = res.data.playlists.filter(
-                    (item) => item.name === LIKED_SONGS_PLAYLIST_NAME,
-                );
-
-                if (_likedSongPlaylist)
-                    setLikedSongsPlaylist(_likedSongPlaylist);
-            })
-            .catch((error) => {
-                dispatch({
-                    type: type.SHOW_MESSAGE_DIALOG,
-                    message: {
-                        title: 'Có lỗi xảy ra',
-                        message: error.message,
-                        type: MessageType.ERROR,
-                    },
-                });
-            })
-            .finally(() => {
-                setIsLoading(false);
-            });
-    }, [state.authData.user.id]);
-
-    useEffect(() => {
         setData((prev) => ({
             followings: prev.followings,
-            playlists: state.favPlaylists,
+            playlists: userDataState.favPlaylists,
         }));
-    }, [state.favPlaylists]);
+    }, [userDataState.favPlaylists]);
 
     useEffect(() => {
         setData((prev) => ({
-            followings: state.favArtists,
+            followings: userDataState.favArtists,
             playlists: prev.playlists,
         }));
-    }, [state.favArtists]);
+    }, [userDataState.favArtists]);
 
     useEffect(() => {
         if (Object.keys(likedSongsPlaylist).length > 0)
             getPlaylistById(likedSongsPlaylist.id).then((res) => {
-                dispatch({
-                    type: type.SET_LIKED_SONGS_PLAYLIST,
+                userDataDispatch({
+                    type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                     playlist: res.data,
                 });
             });
@@ -125,7 +88,7 @@ const AuthSidebarList = () => {
                 <FontAwesomeIcon icon={faMagnifyingGlass} />
             </div>
             <ul>
-                {isLoading ? (
+                {userDataState.isLoading ? (
                     new Array(5)
                         .fill(0)
                         .map((item, index) => (

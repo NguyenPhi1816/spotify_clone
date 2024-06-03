@@ -5,11 +5,14 @@ import { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
 import { authenticate } from '../../services/authenticationServices';
-import { type, useAppContext } from '../../context/Context';
-import { setAuthCookie } from '../../cookies/setCookie';
 import { useForm } from 'react-hook-form';
 import CustomSpinner from '../../icon/spinner/CustomSpinner';
 import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
+import { authContextTypes, useAuthContext } from '../../context/AuthContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 
 const cx = classNames.bind(styles);
 
@@ -23,8 +26,10 @@ const LoginPage = () => {
         formState: { errors },
     } = useForm({ mode: 'onBlur' });
 
+    const { dispatch: authDispatch } = useAuthContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const navigate = useNavigate();
-    const { dispatch } = useAppContext();
     const [rememberMe, setRememberMe] = useState(true);
     const [showPass, setShowPass] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
@@ -48,7 +53,7 @@ const LoginPage = () => {
                 if (rememberMe) {
                     setAuthCookie(data);
                 }
-                dispatch({ payload: data, type: type.LOGIN });
+                authDispatch({ payload: data, type: authContextTypes.LOGIN });
                 navigate('/');
             })
             .catch((err) => {
@@ -63,8 +68,8 @@ const LoginPage = () => {
                     message = 'Lỗi không xác định. Vui lòng thử lại';
                 }
                 setIsLoading(false);
-                dispatch({
-                    type: type.SHOW_MESSAGE_DIALOG,
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
                     message: {
                         title: 'Đăng nhập thất bại',
                         message,

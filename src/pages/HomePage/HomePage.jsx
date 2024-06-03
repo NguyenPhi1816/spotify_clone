@@ -1,16 +1,14 @@
 import MainLayout from '../../layouts/MainLayout/MainLayout';
-
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
 import Content from '../../components/Content';
 import Playbar from '../../components/Playbar';
 import { useEffect, useState } from 'react';
+import { useDialogContext } from '../../context/DialogContext';
 import { getHomeCategory } from '../../services/categoryServices';
-import { type, useAppContext } from '../../context/Context';
-import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 function HomePage() {
-    const { dispatch } = useAppContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
     const [data, setData] = useState([]);
     const [isLoading, setIsLoading] = useState(false);
 
@@ -21,8 +19,8 @@ function HomePage() {
                 setData(res.data);
             })
             .catch((error) =>
-                dispatch({
-                    type: type.SHOW_MESSAGE_DIALOG,
+                dialogDispatch({
+                    type: dialogDispatch.SHOW_MESSAGE_DIALOG,
                     message: {
                         title: 'Có lỗi xảy ra',
                         message: error.message,

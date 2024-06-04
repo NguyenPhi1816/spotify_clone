@@ -91,7 +91,10 @@ const SongSection = () => {
     }, [isShowMore]);
 
     useEffect(() => {
-        if (userDataState.likedSongsPlaylist.songs) {
+        if (
+            userDataState.likedSongsPlaylist &&
+            userDataState.likedSongsPlaylist.songs
+        ) {
             const [song] = userDataState.likedSongsPlaylist.songs.filter(
                 (item) => item.id == id,
             );

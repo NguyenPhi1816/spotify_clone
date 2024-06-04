@@ -42,14 +42,20 @@ const AlbumSongModal = ({
     const handleAddSongToAlbum = () => {
         if (albumId !== null && selectedSongId !== null)
             addSongToAlbum(albumId, selectedSongId).then((res) => {
-                setAlbumSongs(res.data.songs);
+                if (res.data.songs) {
+                    setAlbumSongs(res.data.songs);
+                }
             });
     };
 
     const handleRemoveSongFromAlbum = () => {
         if (albumId !== null && selectedSongId !== null)
             removeSongFromAlbum(albumId, selectedSongId).then((res) => {
-                setAlbumSongs(res.data.songs);
+                if (res.data.songs) {
+                    setAlbumSongs(res.data.songs);
+                } else {
+                    setAlbumSongs([]);
+                }
             });
     };
 
@@ -65,7 +71,11 @@ const AlbumSongModal = ({
 
     useEffect(() => {
         if (albumId !== null) {
-            getAlbumById(albumId).then((res) => setAlbumSongs(res.data.songs));
+            getAlbumById(albumId).then((res) => {
+                if (res.data.songs) {
+                    setAlbumSongs(res.data.songs);
+                }
+            });
         }
     }, [albumId]);
 
@@ -112,29 +122,31 @@ const AlbumSongModal = ({
                                         </div>
                                     </div>
                                 </li>
-                                {songs.map((item, index) => (
-                                    <li key={item.id}>
-                                        <DashboardSong
-                                            index={index}
-                                            data={item}
-                                            addButton={
-                                                albumSongs.filter(
-                                                    (song) =>
-                                                        song.id === item.id,
-                                                ).length === 0
-                                            }
-                                            deleteButton={
-                                                albumSongs.filter(
-                                                    (song) =>
-                                                        song.id === item.id,
-                                                ).length > 0
-                                            }
-                                            onAddSong={handleAddSong}
-                                            onRemoveSong={handleRemoveSong}
-                                            className={cx('dashboard-song')}
-                                        />
-                                    </li>
-                                ))}
+                                {songs &&
+                                    albumSongs &&
+                                    songs.map((item, index) => (
+                                        <li key={item.id}>
+                                            <DashboardSong
+                                                index={index}
+                                                data={item}
+                                                addButton={
+                                                    albumSongs.filter(
+                                                        (song) =>
+                                                            song.id === item.id,
+                                                    ).length === 0
+                                                }
+                                                deleteButton={
+                                                    albumSongs.filter(
+                                                        (song) =>
+                                                            song.id === item.id,
+                                                    ).length > 0
+                                                }
+                                                onAddSong={handleAddSong}
+                                                onRemoveSong={handleRemoveSong}
+                                                className={cx('dashboard-song')}
+                                            />
+                                        </li>
+                                    ))}
                             </ul>
                         </div>
                     </div>

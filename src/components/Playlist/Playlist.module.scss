@@ -1,5 +1,8 @@
 .container {
-    position: relative;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
 .header {
@@ -50,6 +53,23 @@
     height: 4px;
     border-radius: 5rem;
     background-color: var(--background-white);
+}
+
+.flex-1 {
+    flex: 1;
+}
+
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-grey);
+    background-color: var(--background-base);
+    &-icon {
+        margin-bottom: 32px;
+        font-size: 72px;
+    }
 }
 
 .body {

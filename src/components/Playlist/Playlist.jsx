@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import PlayButton from '../PlayButton';
 import FavButton from '../FavButton';
 import Song from '../Song';
-import { faClock } from '@fortawesome/free-solid-svg-icons';
+import { faClock, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { getPlaylistById } from '../../services/playlistServices';
 import Loading from '../Loading';
@@ -137,50 +137,62 @@ const Playlist = () => {
                     </p>
                 </div>
             </div>
-            <div className={cx('body')}>
-                <div className={cx('btns')}>
-                    <PlayButton
-                        isPlaying={isPlaying}
-                        onClick={handlePlayList}
-                        className={cx('btn')}
-                        size="56px"
-                    />
-                    <FavButton
-                        onClick={hanldeLikePlaylist}
-                        isActive={isFavPlaylist}
-                        className={cx('btn')}
-                        size="32px"
-                    />
-                </div>
-                <ul>
-                    <li className={cx('list-header')}>
-                        <div className={cx('list-header-content')}>
-                            <p className={cx('index')}>#</p>
-                            <p className={cx('first')}>Tiêu đề</p>
-                            <p className={cx('album')}>Album</p>
-                            <p className={cx('created-at')}>Ngày thêm</p>
-                            <div className={cx('last')}>
-                                <span> </span>
-                                <FontAwesomeIcon icon={faClock} />
-                                <span> </span>
-                            </div>
+            {data.songs &&
+                (data.songs.length > 0 ? (
+                    <div className={cx('body')}>
+                        <div className={cx('btns')}>
+                            <PlayButton
+                                isPlaying={isPlaying}
+                                onClick={handlePlayList}
+                                className={cx('btn')}
+                                size="56px"
+                            />
+                            <FavButton
+                                onClick={hanldeLikePlaylist}
+                                isActive={isFavPlaylist}
+                                className={cx('btn')}
+                                size="32px"
+                            />
                         </div>
-                    </li>
-                    {data.songs &&
-                        data.songs.map((item, index) => (
-                            <li key={item.id}>
-                                <Song
-                                    index={index}
-                                    currentList={data.songs}
-                                    data={item}
-                                    showArtists
-                                    showAlbums
-                                    showCreatedDate
-                                />
+                        <ul>
+                            <li className={cx('list-header')}>
+                                <div className={cx('list-header-content')}>
+                                    <p className={cx('index')}>#</p>
+                                    <p className={cx('first')}>Tiêu đề</p>
+                                    <p className={cx('album')}>Album</p>
+                                    <p className={cx('created-at')}>
+                                        Ngày thêm
+                                    </p>
+                                    <div className={cx('last')}>
+                                        <span> </span>
+                                        <FontAwesomeIcon icon={faClock} />
+                                        <span> </span>
+                                    </div>
+                                </div>
                             </li>
-                        ))}
-                </ul>
-            </div>
+                            {data.songs.map((item, index) => (
+                                <li key={item.id}>
+                                    <Song
+                                        index={index}
+                                        currentList={data.songs}
+                                        data={item}
+                                        showArtists
+                                        showAlbums
+                                        showCreatedDate
+                                    />
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                ) : (
+                    <div className={cx('placeholder', 'flex-1')}>
+                        <FontAwesomeIcon
+                            icon={faFolderOpen}
+                            className={cx('placeholder-icon')}
+                        />
+                        <h4>Danh sách này chưa có bài hát nào</h4>
+                    </div>
+                ))}
             {isLoading && <Loading isFitMainLayoutContent />}
         </div>
     );

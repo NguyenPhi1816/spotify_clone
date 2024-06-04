@@ -6,11 +6,20 @@ import Button from '../Button';
 import { useEffect, useState } from 'react';
 import { uploadComment } from '../../services/reviewServices';
 import { useAuthContext } from '../../context/AuthContext';
+import CustomSpinner from '../../icon/spinner';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const Comments = ({ data = [], songId }) => {
     const { state: authState } = useAuthContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
+
+    const [isLoading, setIsLoading] = useState(false);
     const [comment, setComment] = useState('');
     const [commentList, setCommentList] = useState([]);
 
@@ -48,12 +57,23 @@ const Comments = ({ data = [], songId }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        await uploadComment(authState.authData.user.id, songId, comment).then(
-            (res) => {
-                const newCommentList = [...commentList, res.data];
-                setCommentList(newCommentList);
-            },
-        );
+        setIsLoading(true);
+        await uploadComment(authState.authData.user.id, songId, comment)
+            .then((res) => {
+                setCommentList(res.data);
+                setComment('');
+            })
+            .catch((error) => {
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
+            .finally(() => setIsLoading(false));
     };
 
     useEffect(() => {
@@ -67,10 +87,10 @@ const Comments = ({ data = [], songId }) => {
                 <div className={cx('user-section')}>
                     <span className={cx('author')}>
                         <img
-                            src="../src/assets/images/den_vau.jpg"
-                            alt="name"
+                            src={authState.authData.user.photoImagePath}
+                            alt={authState.authData.user.fullName}
                         />
-                        <p>Đen Vâu</p>
+                        <p>{authState.authData.user.fullName}</p>
                     </span>
                     <form className={cx('form')}>
                         <textarea
@@ -78,38 +98,45 @@ const Comments = ({ data = [], songId }) => {
                             onChange={(e) => handleChange(e)}
                             placeholder="Hãy để lại một bình luận về bài hát..."
                         />
-                        <input
-                            type="submit"
+                        <button
+                            className={cx('submit-btn')}
                             onClick={handleSubmit}
-                            value="Bình luận"
-                        />
+                        >
+                            {isLoading && <CustomSpinner />}
+                            Bình luận
+                        </button>
                     </form>
                 </div>
             )}
             <div className={cx('comment')}>
                 <ul className={cx('comment-list')}>
-                    {commentList.map((item) => (
-                        <li key={item.id}>
-                            <span className={cx('author')}>
-                                <img
-                                    src={item.user.photoImagePath}
-                                    alt={item.user.fullName}
-                                />
-                                <p>{item.user.fullName}</p>
-                            </span>
-                            <div className={cx('comment-text')}>
-                                <p>{item.content}</p>
-                            </div>
-                            <div className={cx('comment-bottom')}>
-                                <Button
-                                    className={cx('like-btn')}
-                                    noBackground
-                                    content={<FontAwesomeIcon icon={faHeart} />}
-                                />
-                                <p>{calculateCreatedDate(item.createdAt)}</p>
-                            </div>
-                        </li>
-                    ))}
+                    {commentList.length > 0 &&
+                        commentList.map((item) => (
+                            <li key={item.id}>
+                                <span className={cx('author')}>
+                                    <img
+                                        src={item.user.photoImagePath}
+                                        alt={item.user.fullName}
+                                    />
+                                    <p>{item.user.fullName}</p>
+                                </span>
+                                <div className={cx('comment-text')}>
+                                    <p>{item.content}</p>
+                                </div>
+                                <div className={cx('comment-bottom')}>
+                                    <Button
+                                        className={cx('like-btn')}
+                                        noBackground
+                                        content={
+                                            <FontAwesomeIcon icon={faHeart} />
+                                        }
+                                    />
+                                    <p>
+                                        {calculateCreatedDate(item.createdAt)}
+                                    </p>
+                                </div>
+                            </li>
+                        ))}
                 </ul>
             </div>
         </div>

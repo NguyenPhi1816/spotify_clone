@@ -13,6 +13,7 @@ import {
     dialogContextTypes,
     useDialogContext,
 } from '../../context/DialogContext';
+import { setAuthCookie } from '../../cookies/setCookie';
 
 const cx = classNames.bind(styles);
 
@@ -57,6 +58,7 @@ const LoginPage = () => {
                 navigate('/');
             })
             .catch((err) => {
+                console.log(err.message);
                 let message = '';
                 if (err.code === ERR_NETWORK) {
                     message =

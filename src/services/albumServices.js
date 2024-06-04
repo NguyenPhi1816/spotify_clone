@@ -4,8 +4,17 @@ export const getAlbumById = (id) => {
     return api.get(`/album/${id}`);
 };
 
-export const createAlbum = (userId, albumName) => {
-    return api.post(`album/${userId}/add`, { name: albumName });
+export const createAlbum = (accessToken, albumName) => {
+    console.log(accessToken);
+    return api.post(
+        `album`,
+        {
+            name: albumName,
+        },
+        {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        },
+    );
 };
 
 export const addSongToAlbum = (albumId, songId) => {

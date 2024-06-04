@@ -9,11 +9,13 @@ import AlbumSongModal from '../AlbumSongModal';
 import AddAlbumModal from '../AddAlbumModal';
 import Loading from '../Loading';
 import { createAlbum, getAlbumById } from '../../services/albumServices';
+import { useAuthContext } from '../../context/AuthContext';
 
 const cx = classNames.bind(styles);
 
 const AlbumManagement = () => {
     const { id } = useParams();
+    const { state: authState } = useAuthContext();
     const [data, setData] = useState([]);
     const [showAddAlbumModal, setShowAddAlbumModal] = useState(false);
     const [showAddSongModal, setShowAddSongModal] = useState(false);
@@ -25,12 +27,18 @@ const AlbumManagement = () => {
     };
 
     const handleSaveAlbum = async (value) => {
-        const albumId = await createAlbum(id, value).then((res) => res.data);
-        const album = await getAlbumById(albumId).then((res) => res.data);
-        data.push(album);
-        setNewAlbumId(albumId);
-        setShowAddAlbumModal(false);
-        setShowAddSongModal(true);
+        const accessToken = authState.authData['access_token'];
+        if (accessToken) {
+            await createAlbum(accessToken, value)
+                .then((res) => {
+                    const album = res.data;
+                    data.push(album);
+                    setNewAlbumId(album.id);
+                    setShowAddAlbumModal(false);
+                    setShowAddSongModal(true);
+                })
+                .catch((error) => console.log(error));
+        }
     };
 
     useEffect(() => {
@@ -40,6 +48,8 @@ const AlbumManagement = () => {
             setIsLoading(false);
         });
     }, [id]);
+
+    console.log(data);
 
     return (
         <section className={cx('container')}>

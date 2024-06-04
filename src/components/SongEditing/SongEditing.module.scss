@@ -196,13 +196,15 @@
         }
 
         .audio-link {
+            width: 100%;
             display: flex;
-            align-self: center;
 
             & > a {
-                margin-right: 15px;
-                display: flex;
-                align-self: center;
+                padding-right: 5%;
+                width: 60%;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
 
                 &:hover {
                     text-decoration: underline;
@@ -210,6 +212,7 @@
             }
 
             & > button {
+                margin-left: 16px;
                 padding: 6px 12px !important;
             }
         }

@@ -21,6 +21,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import AddArtistToSong from '../AddArtistToSong/AddArtistToSong';
 import { useAuthContext } from '../../context/AuthContext';
+import CustomSpinner from '../../icon/spinner';
 
 const cx = classNames.bind(styles);
 
@@ -64,8 +65,16 @@ const SongEditing = () => {
     };
 
     const handleChangeAudio = (file) => {
-        uploadSongAudio(id, file).then((res) => setData(res.data));
         setShowUploadAudioModal(false);
+        setIsLoading(true);
+        uploadSongAudio(id, file)
+            .then((res) => {
+                setData(res.data);
+            })
+            .catch((error) => console.log(error))
+            .finally(() => {
+                setIsLoading(false);
+            });
     };
 
     const dateExtractor = (date) => {
@@ -300,12 +309,12 @@ const SongEditing = () => {
                 <div className={cx('audio-container')}>
                     <h3>Tệp âm thanh</h3>
                     <div className={cx('audio-link')}>
-                        <Link to={data.audioPath}>
-                            <p>{data.audioPath}</p>
-                        </Link>
+                        <Link to={data.audioPath}>{data.audioPath}</Link>
                         <Button
                             onClick={handleShowUploadAudioModal}
-                            content={'Thay đổi'}
+                            content={
+                                <>{isLoading && <CustomSpinner />} Thay đổi</>
+                            }
                         />
                     </div>
                 </div>
@@ -340,7 +349,6 @@ const SongEditing = () => {
                     onSave={handleChangeLyrics}
                 />
             )}
-            {isLoading && <Loading isFitDashboardLayoutContent />}
             {isEditArtist && (
                 <AddArtistToSong
                     songId={id}

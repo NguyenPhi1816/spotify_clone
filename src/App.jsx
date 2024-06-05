@@ -43,6 +43,7 @@ const PreloadData = ({ children }) => {
         }
 
         // handle load playbar states from cookie
+        songDispatch({ type: songContextTypes.SET_LOADING, isLoading: true });
         const states = getStatesCookie();
         if (states) {
             const playlistId = states.currentPlayingListId;
@@ -88,6 +89,7 @@ const PreloadData = ({ children }) => {
                 },
             });
         }
+        songDispatch({ type: songContextTypes.SET_LOADING, isLoading: false });
     }, []);
 
     // handle load user data if authData existed in context

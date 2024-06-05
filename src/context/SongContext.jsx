@@ -3,7 +3,7 @@ import { createContext, useContext, useMemo, useReducer } from 'react';
 const SongContext = createContext();
 
 const initialStates = {
-    isLoading: true,
+    isLoading: false,
     isPlaying: false,
     currentPlayingPath: null,
     currentPlayingList: null,
@@ -16,6 +16,7 @@ const initialStates = {
 };
 
 export const songContextTypes = {
+    SET_LOADING: 'SET_LOADING',
     PRELOAD_DATA: 'PRELOAD_DATA',
     LOAD_SONG: 'LOAD_SONG',
     PLAY_SONG: 'PLAY_SONG',
@@ -32,10 +33,14 @@ export const songContextTypes = {
 
 const reducer = (state, action) => {
     switch (action.type) {
+        case songContextTypes.SET_LOADING:
+            return {
+                ...state,
+                isLoading: action.isLoading,
+            };
         case songContextTypes.PRELOAD_DATA:
             return {
-                isLoading: false,
-                isPlaying: false,
+                ...state,
                 currentPlayingPath: action.data.currentPlayingPath,
                 currentPlayingList: action.data.currentPlayingList,
                 currentPlayingSongIndex: action.data.currentPlayingSongIndex,

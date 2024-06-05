@@ -15,6 +15,7 @@ const initialStates = {
 };
 
 export const songContextTypes = {
+    PRELOAD_DATA: 'PRELOAD_DATA',
     LOAD_SONG: 'LOAD_SONG',
     PLAY_SONG: 'PLAY_SONG',
     PAUSE_SONG: 'PAUSE_SONG',
@@ -30,6 +31,18 @@ export const songContextTypes = {
 
 const reducer = (state, action) => {
     switch (action.type) {
+        case songContextTypes.PRELOAD_DATA:
+            return {
+                isPlaying: false,
+                currentPlayingPath: action.data.currentPlayingPath,
+                currentPlayingList: action.data.currentPlayingList,
+                currentPlayingSongIndex: action.data.currentPlayingSongIndex,
+                currentPlayingSong: action.data.currentPlayingSong,
+                currentPlayingSongId: action.data.currentPlayingSongId,
+                volume: action.data.volume,
+                isRandom: action.data.isRandom,
+                isLoop: action.data.isLoop,
+            };
         case songContextTypes.LOAD_SONG:
             return {
                 ...state,

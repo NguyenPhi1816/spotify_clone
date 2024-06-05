@@ -15,7 +15,10 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import SearchByEmotion from '../SearchByEmotion';
 import { isArtist } from '../../services/authorizationServices';
-import { removeAuthCookie } from '../../cookies/removeCookie';
+import {
+    removeAuthCookie,
+    removeStatesCookie,
+} from '../../cookies/removeCookie';
 import useDebounce from '../../hooks/useDebounce';
 
 import PropTypes from 'prop-types';
@@ -49,6 +52,7 @@ function Navbar({ onSearch, showSearchBar }) {
         userDataDispatch({ type: userDataContextTypes.CLEAR_USER_DATA });
         songDispatch({ type: songContextTypes.CLEAR_SONG });
         removeAuthCookie();
+        removeStatesCookie();
         navigate('/login');
     };
 

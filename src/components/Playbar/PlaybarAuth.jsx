@@ -19,6 +19,7 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import { useInteractionContext } from '../../context/InteractionContext';
 
 const cx = classNames.bind(styles);
 
@@ -34,6 +35,7 @@ const PlaybarAuth = () => {
     const HIGH_VALUE = 1;
 
     const { state: songState, dispatch: songDispatch } = useSongContext();
+    const { state: interactionState } = useInteractionContext();
 
     const [playStatus, setPlayStatus] = useState(() => songState.isPlaying);
     const [volumeValue, setVolumeValue] = useState(songState.volume);
@@ -55,6 +57,18 @@ const PlaybarAuth = () => {
     const [remainTime, setRemainTime] = useState('--:--');
     const [isRandom, setIsRandom] = useState(songState.isRandom);
     const [isLoop, setIsLoop] = useState(songState.isLoop);
+
+    useEffect(() => {
+        setVolumeValue(songState.volume);
+    }, [songState.volume]);
+
+    useEffect(() => {
+        setIsRandom(songState.isRandom);
+    }, [songState.isRandom]);
+
+    useEffect(() => {
+        setIsLoop(songState.isLoop);
+    }, [songState.isLoop]);
 
     const handleTogglePlayPauseSong = () => {
         if (playStatus) {
@@ -171,9 +185,11 @@ const PlaybarAuth = () => {
                 currentPlayingSong: song,
             });
             setCurrentPlayingSong(song);
-            setTimeout(() => {
-                songDispatch({ type: songContextTypes.PLAY_SONG });
-            }, 1000);
+            if (interactionState.isUserFirstInteracted) {
+                setTimeout(() => {
+                    songDispatch({ type: songContextTypes.PLAY_SONG });
+                }, 1000);
+            }
         };
 
         const handleCanPlayThrough = () => {

@@ -6,12 +6,16 @@ import HeadlessTippy from '../../components/HeadlessTippy';
 import Button from '../../components/Button';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { removeAuthCookie } from '../../cookies/removeCookie';
+import {
+    removeAuthCookie,
+    removeStatesCookie,
+} from '../../cookies/removeCookie';
 import { authContextTypes, useAuthContext } from '../../context/AuthContext';
 import {
     useUserDataContext,
     userDataContextTypes,
 } from '../../context/UserDataContext';
+import { useSongContext } from '../../context/SongContext';
 
 const cx = classNames.bind(styles);
 
@@ -30,6 +34,7 @@ const ProfilePage = () => {
         userDataDispatch({ type: userDataContextTypes.CLEAR_USER_DATA });
         songDispatch({ type: songContextTypes.CLEAR_SONG });
         removeAuthCookie();
+        removeStatesCookie();
         navigate('/login');
     };
 

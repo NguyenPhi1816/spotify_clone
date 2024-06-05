@@ -89,7 +89,7 @@ const Song = ({
             if (!songState.isPlaying) {
                 songDispatch({ type: songContextTypes.PLAY_SONG });
             } else {
-                songContextTypes({ type: songContextTypes.PAUSE_SONG });
+                songDispatch({ type: songContextTypes.PAUSE_SONG });
             }
         }
     };

@@ -55,23 +55,6 @@
     background-color: var(--background-white);
 }
 
-.flex-1 {
-    flex: 1;
-}
-
-.placeholder {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    color: var(--text-grey);
-    background-color: var(--background-base);
-    &-icon {
-        margin-bottom: 32px;
-        font-size: 72px;
-    }
-}
-
 .body {
     padding-bottom: 30px;
     position: relative;

@@ -8,12 +8,19 @@ import Button from '../Button';
 import AlbumSongModal from '../AlbumSongModal';
 import AddAlbumModal from '../AddAlbumModal';
 import Loading from '../Loading';
-import { createAlbum, getAlbumById } from '../../services/albumServices';
+import { createAlbum } from '../../services/albumServices';
 import { useAuthContext } from '../../context/AuthContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const AlbumManagement = () => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const { id } = useParams();
     const { state: authState } = useAuthContext();
     const [data, setData] = useState([]);
@@ -37,16 +44,39 @@ const AlbumManagement = () => {
                     setShowAddAlbumModal(false);
                     setShowAddSongModal(true);
                 })
-                .catch((error) => console.log(error));
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
         }
     };
 
     useEffect(() => {
         setIsLoading(true);
-        getAlbumsSongsByUserId(id).then((res) => {
-            setData(res.data.albums);
-            setIsLoading(false);
-        });
+        getAlbumsSongsByUserId(id)
+            .then((res) => {
+                setData(res.data.albums);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, [id]);
 
     console.log(data);

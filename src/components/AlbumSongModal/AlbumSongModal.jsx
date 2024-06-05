@@ -13,6 +13,11 @@ import {
     getAlbumById,
     removeSongFromAlbum,
 } from '../../services/albumServices';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -22,6 +27,8 @@ const AlbumSongModal = ({
     onClose = () => {},
     onChange = () => {},
 }) => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const [songs, setSongs] = useState([]);
     const [showAddConfirm, setShowAddConfirm] = useState(false);
     const [showRemoveConfirm, setShowRemoveConfirm] = useState(false);
@@ -41,41 +48,86 @@ const AlbumSongModal = ({
 
     const handleAddSongToAlbum = () => {
         if (albumId !== null && selectedSongId !== null)
-            addSongToAlbum(albumId, selectedSongId).then((res) => {
-                if (res.data.songs) {
-                    setAlbumSongs(res.data.songs);
-                }
-            });
+            addSongToAlbum(albumId, selectedSongId)
+                .then((res) => {
+                    if (res.data.songs) {
+                        setAlbumSongs(res.data.songs);
+                    }
+                })
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
     };
 
     const handleRemoveSongFromAlbum = () => {
         if (albumId !== null && selectedSongId !== null)
-            removeSongFromAlbum(albumId, selectedSongId).then((res) => {
-                if (res.data.songs) {
-                    setAlbumSongs(res.data.songs);
-                } else {
-                    setAlbumSongs([]);
-                }
-            });
+            removeSongFromAlbum(albumId, selectedSongId)
+                .then((res) => {
+                    if (res.data.songs) {
+                        setAlbumSongs(res.data.songs);
+                    } else {
+                        setAlbumSongs([]);
+                    }
+                })
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
     };
 
     useEffect(() => {
         if (userId !== null) {
             setIsLoading(true);
-            getAlbumsSongsByUserId(userId).then((res) => {
-                setSongs(res.data.songs);
-                setIsLoading(false);
-            });
+            getAlbumsSongsByUserId(userId)
+                .then((res) => {
+                    setSongs(res.data.songs);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     }, [userId]);
 
     useEffect(() => {
         if (albumId !== null) {
-            getAlbumById(albumId).then((res) => {
-                if (res.data.songs) {
-                    setAlbumSongs(res.data.songs);
-                }
-            });
+            getAlbumById(albumId)
+                .then((res) => {
+                    if (res.data.songs) {
+                        setAlbumSongs(res.data.songs);
+                    }
+                })
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
         }
     }, [albumId]);
 

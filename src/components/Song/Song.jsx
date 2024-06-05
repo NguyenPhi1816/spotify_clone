@@ -16,6 +16,11 @@ import {
     userDataContextTypes,
 } from '../../context/UserDataContext';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -33,6 +38,7 @@ const Song = ({
     const { state: userDataState, dispatch: userDataDispatch } =
         useUserDataContext();
     const { state: songState, dispatch: songDispatch } = useSongContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const location = useLocation();
     const [isCurrentSong, setIsCurrentSong] = useState(true);
@@ -118,18 +124,28 @@ const Song = ({
 
     const handleLikeSong = () => {
         if (!isFavSong) {
-            addSongToFavPlaylist(authState.authData.user.id, data.id).then(
-                (res) => {
+            addSongToFavPlaylist(authState.authData.user.id, data.id)
+                .then((res) => {
                     userDataDispatch({
                         type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
                         playlist: res.data,
                     });
                     setIsFavSong(true);
-                },
-            );
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         } else {
-            removeSongFromFavPlaylist(authState.authData.user.id, data.id).then(
-                (res) => {
+            removeSongFromFavPlaylist(authState.authData.user.id, data.id)
+                .then((res) => {
                     if (
                         res.status == 200 &&
                         userDataState.likedSongsPlaylist.songs
@@ -148,8 +164,18 @@ const Song = ({
                         });
                         setIsFavSong(false);
                     }
-                },
-            );
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     };
 

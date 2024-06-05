@@ -4,8 +4,12 @@ import Navbar from '../../components/Navbar';
 import Content from '../../components/Content';
 import Playbar from '../../components/Playbar';
 import { useEffect, useState } from 'react';
-import { useDialogContext } from '../../context/DialogContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
 import { getHomeCategory } from '../../services/categoryServices';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 function HomePage() {
     const { dispatch: dialogDispatch } = useDialogContext();
@@ -20,7 +24,7 @@ function HomePage() {
             })
             .catch((error) =>
                 dialogDispatch({
-                    type: dialogDispatch.SHOW_MESSAGE_DIALOG,
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
                     message: {
                         title: 'Có lỗi xảy ra',
                         message: error.message,

@@ -12,6 +12,11 @@ import {
     useUserDataContext,
     userDataContextTypes,
 } from '../../context/UserDataContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -21,6 +26,7 @@ const AuthSidebarList = () => {
 
     const { state: userDataState, dispatch: userDataDispatch } =
         useUserDataContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const [data, setData] = useState({});
     const [activeBtn, setActiveBtn] = useState(null);
@@ -43,12 +49,24 @@ const AuthSidebarList = () => {
 
     useEffect(() => {
         if (Object.keys(likedSongsPlaylist).length > 0)
-            getPlaylistById(likedSongsPlaylist.id).then((res) => {
-                userDataDispatch({
-                    type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
-                    playlist: res.data,
+            getPlaylistById(likedSongsPlaylist.id)
+                .then((res) => {
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
+                        playlist: res.data,
+                    });
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
                 });
-            });
     }, [likedSongsPlaylist]);
 
     const handleClick = (target, type) => {

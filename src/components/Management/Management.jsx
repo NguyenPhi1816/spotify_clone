@@ -12,12 +12,19 @@ import {
 import DashboardSong from '../Song/DashboardSong';
 import Loading from '../Loading';
 import ShelfItem from '../ShelfItem';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const Management = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
+
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const { id } = useParams();
     const [data, setData] = useState({});
@@ -28,16 +35,40 @@ const Management = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getUserById(id).then((res) => {
-            setData(res.data);
-        });
+        getUserById(id)
+            .then((res) => {
+                setData(res.data);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     useEffect(() => {
-        getAlbumsSongsByUserId(id).then((res) => {
-            setAlbums(res.data.albums);
-            setIsLoading(false);
-        });
+        getAlbumsSongsByUserId(id)
+            .then((res) => {
+                setAlbums(res.data.albums);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     useEffect(() => {

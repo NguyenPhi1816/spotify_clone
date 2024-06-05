@@ -5,8 +5,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 const cx = classNames.bind(styles);
 
-const CustomSpinner = () => {
-    return <FontAwesomeIcon icon={faSpinner} className={cx('spinner')} />;
+const CustomSpinner = ({ className }) => {
+    return (
+        <FontAwesomeIcon
+            icon={faSpinner}
+            className={cx('spinner', className)}
+        />
+    );
 };
 
 export default CustomSpinner;

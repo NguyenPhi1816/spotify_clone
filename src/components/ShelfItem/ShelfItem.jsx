@@ -9,6 +9,11 @@ import { faPen } from '@fortawesome/free-solid-svg-icons';
 import { getPlaylistById } from '../../services/playlistServices';
 import { getAlbumById } from '../../services/albumServices';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -16,6 +21,7 @@ function ShelfItem({ type, shelfItemData = {}, edit = false }) {
     const PLAYLIST = 'playlist';
     const ALBUM = 'album';
 
+    const { dispatch: dialogDispatch } = useDialogContext();
     const { state: songState, dispatch: songDispatch } = useSongContext();
 
     const [data, setData] = useState({});
@@ -28,23 +34,56 @@ function ShelfItem({ type, shelfItemData = {}, edit = false }) {
     const handlePlayList = async () => {
         let list = [];
         if (type === PLAYLIST)
-            list = await getPlaylistById(data.id).then((res) => res.data.songs);
+            list = await getPlaylistById(data.id)
+                .then((res) => res.data.songs)
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.INFORMATION,
+                        },
+                    }),
+                );
         if (type === ALBUM)
-            list = await getAlbumById(data.id).then((res) => res.data.songs);
+            list = await getAlbumById(data.id)
+                .then((res) => res.data.songs)
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
 
-        if (songState.currentPlayingPath !== `/${type}/${data.id}`) {
-            songDispatch({
-                type: songContextTypes.LOAD_SONG,
-                currentPlayingPath: `/${type}/${data.id}`,
-                currentPlayingList: list,
-                currentPlayingSongIndex: 0,
-            });
-        } else {
-            if (!songState.isPlaying) {
-                songDispatch({ type: songContextTypes.PLAY_SONG });
+        if (list && list.length > 0) {
+            if (songState.currentPlayingPath !== `/${type}/${data.id}`) {
+                songDispatch({
+                    type: songContextTypes.LOAD_SONG,
+                    currentPlayingPath: `/${type}/${data.id}`,
+                    currentPlayingList: list,
+                    currentPlayingSongIndex: 0,
+                });
             } else {
-                songDispatch({ type: songContextTypes.PAUSE_SONG });
+                if (!songState.isPlaying) {
+                    songDispatch({ type: songContextTypes.PLAY_SONG });
+                } else {
+                    songDispatch({ type: songContextTypes.PAUSE_SONG });
+                }
             }
+        } else {
+            dialogDispatch({
+                type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                message: {
+                    title: 'Có lỗi xảy ra',
+                    message: 'Danh sách phát trống',
+                    type: MessageType.INFORMATION,
+                },
+            });
         }
     };
 

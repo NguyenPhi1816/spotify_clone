@@ -13,10 +13,17 @@ import {
     uploadSongAudio,
     uploadSongImage,
 } from '../../services/songServices';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const MusicManagement = () => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const { id } = useParams();
     const [data, setData] = useState({});
     const [showDeleteSongConfirm, setShowDeleteSongConfirm] = useState(false);
@@ -38,15 +45,47 @@ const MusicManagement = () => {
             songData.year,
             songData.label,
             songData.usersId,
-        ).then((res) => res.data);
+        )
+            .then((res) => res.data)
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
 
-        newSong = await uploadSongImage(newSong.id, selectedImage).then(
-            (res) => res.data,
-        );
+        newSong = await uploadSongImage(newSong.id, selectedImage)
+            .then((res) => res.data)
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
 
-        newSong = await uploadSongAudio(newSong.id, selectedAudio).then(
-            (res) => res.data,
-        );
+        newSong = await uploadSongAudio(newSong.id, selectedAudio)
+            .then((res) => res.data)
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
 
         const newData = { ...data, songs: [...data.songs, newSong] };
         setData(newData);
@@ -60,10 +99,22 @@ const MusicManagement = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getUserById(id).then((res) => {
-            setData(res.data);
-            setIsLoading(false);
-        });
+        getUserById(id)
+            .then((res) => {
+                setData(res.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     return (

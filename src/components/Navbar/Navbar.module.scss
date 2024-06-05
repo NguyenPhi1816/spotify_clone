@@ -92,7 +92,20 @@
         position: absolute;
         top: 50%;
         left: 0;
-        transform: translateY(-45%);
+        transform: translateY(-50%);
+        width: 42px;
+        height: 42px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: var(--text-grey);
+    }
+
+    & > .spinner {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
         width: 42px;
         height: 42px;
         display: flex;

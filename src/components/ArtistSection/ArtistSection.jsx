@@ -31,6 +31,11 @@ import {
     userDataContextTypes,
 } from '../../context/UserDataContext';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -42,6 +47,7 @@ const ArtistSection = () => {
     const { state: userDataState, dispatch: userDataDispatch } =
         useUserDataContext();
     const { state: songState, dispatch: songDispatch } = useSongContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const { id } = useParams();
     const location = useLocation();
@@ -55,14 +61,38 @@ const ArtistSection = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getUserById(id).then((res) => {
-            setData(res.data);
-            setIsLoading(false);
-        });
+        getUserById(id)
+            .then((res) => {
+                setData(res.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     useEffect(() => {
-        getAlbumsSongsByUserId(id).then((res) => setAlbums(res.data.albums));
+        getAlbumsSongsByUserId(id)
+            .then((res) => setAlbums(res.data.albums))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     useEffect(() => {
@@ -95,27 +125,73 @@ const ArtistSection = () => {
 
     const hanldeLikeArtist = async () => {
         if (!isFavArtist) {
-            await addFavArtist(authState.authData.user.id, id);
-            setTimeout(() => {
-                getFavArtist(authState.authData.user.id).then((res) => {
-                    userDataDispatch({
-                        type: userDataContextTypes.SET_FAV_ARTISTS,
-                        artists: res.data,
+            await addFavArtist(authState.authData.user.id, id)
+                .then(() => {
+                    setTimeout(() => {
+                        getFavArtist(authState.authData.user.id)
+                            .then((res) => {
+                                userDataDispatch({
+                                    type: userDataContextTypes.SET_FAV_ARTISTS,
+                                    artists: res.data,
+                                });
+                                setIsFavArtist(true);
+                            })
+                            .catch((error) => {
+                                dialogDispatch({
+                                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                                    message: {
+                                        title: 'Có lỗi xảy ra',
+                                        message: error.message,
+                                        type: MessageType.ERROR,
+                                    },
+                                });
+                            });
+                    }, 500);
+                })
+                .catch((error) => {
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
                     });
-                    setIsFavArtist(true);
                 });
-            }, 500);
         } else {
-            await removeFavArtist(authState.authData.user.id, id);
-            setTimeout(() => {
-                getFavArtist(authState.authData.user.id).then((res) => {
-                    userDataDispatch({
-                        type: userDataContextTypes.SET_FAV_ARTISTS,
-                        artists: res.data,
+            await removeFavArtist(authState.authData.user.id, id)
+                .then(() => {
+                    setTimeout(() => {
+                        getFavArtist(authState.authData.user.id)
+                            .then((res) => {
+                                userDataDispatch({
+                                    type: userDataContextTypes.SET_FAV_ARTISTS,
+                                    artists: res.data,
+                                });
+                                setIsFavArtist(false);
+                            })
+                            .catch((error) => {
+                                dialogDispatch({
+                                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                                    message: {
+                                        title: 'Có lỗi xảy ra',
+                                        message: error.message,
+                                        type: MessageType.ERROR,
+                                    },
+                                });
+                            });
+                    }, 500);
+                })
+                .catch((error) => {
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
                     });
-                    setIsFavArtist(false);
                 });
-            }, 500);
         }
     };
 

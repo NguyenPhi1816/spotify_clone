@@ -11,6 +11,11 @@ import { getFollowingsByUserId } from '../../services/followingServices';
 import Loading from '../Loading';
 import ArtistCard from '../ArtistCard/ArtistCard';
 import { useAuthContext } from '../../context/AuthContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -18,7 +23,9 @@ const UserSection = () => {
     const HIDDEN_SONG_NUMBERS = 5;
     const DISPLAYED_SONG_NUMBERS = 10;
 
+    const { dispatch: dialogDispatch } = useDialogContext();
     const { state: authState } = useAuthContext();
+
     const ref = useRef();
     const [user, setUser] = useState({});
     const [songs, setSongs] = useState([]);
@@ -31,18 +38,40 @@ const UserSection = () => {
     useEffect(() => {
         setIsLoading(true);
         if (user.id) {
-            getAlbumsSongsByUserId(user.id).then((res) => {
-                setSongs(res.data.songs);
-                setIsLoading(false);
-            });
+            getAlbumsSongsByUserId(user.id)
+                .then((res) => {
+                    setSongs(res.data.songs);
+                    setIsLoading(false);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     }, [user]);
 
     useEffect(() => {
         if (user.id) {
-            getFollowingsByUserId(user.id).then((res) =>
-                setFollowing(res.data),
-            );
+            getFollowingsByUserId(user.id)
+                .then((res) => setFollowing(res.data))
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     }, [user]);
 

@@ -4,17 +4,22 @@ import Button from '../Button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 import { useEffect, useState } from 'react';
-import { getAlbumsSongsByUserId } from '../../services/userServices';
 import Song from '../Song';
-import Shelf from '../Shelf';
 import Loading from '../Loading';
 import useDebounce from '../../hooks/useDebounce';
 import { searchBySentiment } from '../../services/songServices';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const SearchByEmotion = ({ onClose = () => {} }) => {
     const NUMBER_OF_SONGS = 5;
+
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const [songs, setSongs] = useState([]);
     const [numberOfSongs, setNumberOfSongs] = useState(5);
@@ -32,7 +37,19 @@ const SearchByEmotion = ({ onClose = () => {} }) => {
     useEffect(() => {
         if (debounceValue !== '') {
             setIsLoading(true);
-            searchBySentiment(debounceValue).then((res) => setSongs(res.data));
+            searchBySentiment(debounceValue)
+                .then((res) => setSongs(res.data))
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
             setIsLoading(false);
         }
     }, [debounceValue]);

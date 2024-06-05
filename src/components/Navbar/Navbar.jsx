@@ -28,10 +28,11 @@ import {
     userDataContextTypes,
 } from '../../context/UserDataContext';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import CustomSpinner from '../../icon/spinner/CustomSpinner';
 
 const cx = classNames.bind(styles);
 
-function Navbar({ onSearch, showSearchBar }) {
+function Navbar({ onSearch, showSearchBar, isLoading }) {
     const { state: authState, dispatch: authDispatch } = useAuthContext();
     const { dispatch: userDataDispatch } = useUserDataContext();
     const { dispatch: songDispatch } = useSongContext();
@@ -95,8 +96,13 @@ function Navbar({ onSearch, showSearchBar }) {
                                 onChange={handleChangeSearchValue}
                                 placeholder="Bạn muốn nghe gì?"
                             />
+                            {isLoading && (
+                                <div className={cx('spinner')}>
+                                    <CustomSpinner />
+                                </div>
+                            )}
                         </label>
-                        <HeadlessTippy
+                        {/* <HeadlessTippy
                             items={
                                 <div className={cx('activation-trigger')}>
                                     <p>
@@ -130,7 +136,7 @@ function Navbar({ onSearch, showSearchBar }) {
                                 onClick={handleShowModal}
                                 className={cx('smart-btn')}
                             />
-                        </HeadlessTippy>
+                        </HeadlessTippy> */}
                     </div>
                 </div>
                 {authState.isAuthenticated ? (
@@ -201,11 +207,16 @@ function Navbar({ onSearch, showSearchBar }) {
     );
 }
 
-Navbar.propTypes = { onSearch: PropTypes.func, showSearchBar: PropTypes.bool };
+Navbar.propTypes = {
+    onSearch: PropTypes.func,
+    showSearchBar: PropTypes.bool,
+    isLoading: PropTypes.bool,
+};
 
 Navbar.defaultProps = {
     onSearch: () => {},
     showSearchBar: false,
+    isLoading: false,
 };
 
 export default Navbar;

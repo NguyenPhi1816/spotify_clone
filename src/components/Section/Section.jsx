@@ -5,10 +5,17 @@ import ShelfItem from '../ShelfItem';
 import { useEffect, useState } from 'react';
 import { getCategoriesById } from '../../services/categoryServices';
 import { getAlbumsSongsByUserId } from '../../services/userServices';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const Section = () => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const { id } = useParams();
     const location = useLocation();
     const [type, setType] = useState('');
@@ -17,15 +24,38 @@ const Section = () => {
     useEffect(() => {
         if (location.pathname === `/section/${id}`) {
             setType('playlist');
-            getCategoriesById(id).then((res) => setData(res.data));
+            getCategoriesById(id)
+                .then((res) => setData(res.data))
+                .catch((error) => {
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         } else if (location.pathname === `/artist/${id}/album`) {
             setType('album');
-            getAlbumsSongsByUserId(id).then((res) => {
-                setData({
-                    title: 'Danh sách album',
-                    playlists: res.data.albums,
+            getAlbumsSongsByUserId(id)
+                .then((res) => {
+                    setData({
+                        title: 'Danh sách album',
+                        playlists: res.data.albums,
+                    });
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
                 });
-            });
         }
     }, [id]);
 

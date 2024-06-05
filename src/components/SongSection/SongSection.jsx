@@ -25,6 +25,11 @@ import {
     userDataContextTypes,
 } from '../../context/UserDataContext';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -35,6 +40,7 @@ const SongSection = () => {
     const { state: authState } = useAuthContext();
     const { state: userDataState, dispatch: userDataDispatch } =
         useUserDataContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
     const { state: songState, dispatch: songDispatch } = useSongContext();
 
     const { id } = useParams();
@@ -53,28 +59,63 @@ const SongSection = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getSongById(id).then((res) => {
-            setData(res.data);
-            setMainArtist(res.data.users[0]);
-            setMainAlbum(res.data.albums[0]);
-            setIsLoading(false);
-        });
+        getSongById(id)
+            .then((res) => {
+                setData(res.data);
+                setMainArtist(res.data.users[0]);
+                setMainAlbum(res.data.albums[0]);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, [id]);
 
     useEffect(() => {
         if (mainAlbum.id) {
-            getAlbumById(mainAlbum.id).then((res) =>
-                setMainAlbumDetail(res.data),
-            );
+            getAlbumById(mainAlbum.id)
+                .then((res) => setMainAlbumDetail(res.data))
+                .catch((error) =>
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    }),
+                );
         }
     }, [mainAlbum.id]);
 
     useEffect(() => {
         if (mainArtist.id) {
-            getAlbumsSongsByUserId(mainArtist.id).then((res) => {
-                setSongs(res.data.songs);
-                setAlbums(res.data.albums);
-            });
+            getAlbumsSongsByUserId(mainArtist.id)
+                .then((res) => {
+                    setSongs(res.data.songs);
+                    setAlbums(res.data.albums);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     }, [mainArtist.id]);
 
@@ -106,16 +147,28 @@ const SongSection = () => {
 
     const handleLikeSong = () => {
         if (!isFavSong) {
-            addSongToFavPlaylist(authState.authData.user.id, id).then((res) => {
-                userDataDispatch({
-                    type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
-                    playlist: res.data,
+            addSongToFavPlaylist(authState.authData.user.id, id)
+                .then((res) => {
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_LIKED_SONGS_PLAYLIST,
+                        playlist: res.data,
+                    });
+                    setIsFavSong(true);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
                 });
-                setIsFavSong(true);
-            });
         } else {
-            removeSongFromFavPlaylist(authState.authData.user.id, id).then(
-                (res) => {
+            removeSongFromFavPlaylist(authState.authData.user.id, id)
+                .then((res) => {
                     if (
                         res.status == 200 &&
                         userDataState.likedSongsPlaylist.songs
@@ -134,8 +187,18 @@ const SongSection = () => {
                         });
                         setIsFavSong(false);
                     }
-                },
-            );
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     };
 

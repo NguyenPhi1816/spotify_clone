@@ -160,3 +160,22 @@ input[type='range']::-webkit-slider-runnable-track {
     border: none;
     background: transparent;
 }
+
+.flex-1 {
+    flex: 1;
+}
+
+.placeholder {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: var(--text-grey);
+    background-color: var(--background-base);
+    &-icon {
+        margin-bottom: 32px;
+        font-size: 72px;
+    }
+}

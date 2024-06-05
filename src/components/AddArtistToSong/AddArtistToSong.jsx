@@ -14,6 +14,11 @@ import {
     getSongById,
     removeUserFromSong,
 } from '../../services/songServices';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -22,6 +27,8 @@ const AddArtistToSong = ({
     onClose = () => {},
     onChange = () => {},
 }) => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const [artists, setArtists] = useState([]);
     const [songArtists, setSongArtists] = useState([]);
     const [selectedArtist, setSelectedArtist] = useState(null);
@@ -40,30 +47,74 @@ const AddArtistToSong = ({
 
     const handleAddArtistToSong = () => {
         if (selectedArtist !== null && songId !== null)
-            addUserToSong(songId, selectedArtist.id).then((res) =>
-                setSongArtists(res.data.users),
-            );
+            addUserToSong(songId, selectedArtist.id)
+                .then((res) => setSongArtists(res.data.users))
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
     };
 
     const handleDeleteArtistFromSong = () => {
         if (selectedArtist !== null && songId !== null)
-            removeUserFromSong(songId, selectedArtist.id).then((res) =>
-                setSongArtists(res.data.users),
-            );
+            removeUserFromSong(songId, selectedArtist.id)
+                .then((res) => setSongArtists(res.data.users))
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
     };
 
     useEffect(() => {
         if (debounceValue !== '') {
             setIsLoading(true);
-            searchArtistByName(debounceValue).then((res) =>
-                setArtists(res.data),
-            );
-            setIsLoading(false);
+            searchArtistByName(debounceValue)
+                .then((res) => setArtists(res.data))
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                })
+                .finally(() => {
+                    setIsLoading(false);
+                });
         }
     }, [debounceValue]);
 
     useEffect(() => {
-        getSongById(songId).then((res) => setSongArtists(res.data.users));
+        getSongById(songId)
+            .then((res) => setSongArtists(res.data.users))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [songId]);
 
     useEffect(() => {

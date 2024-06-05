@@ -22,11 +22,17 @@ import { faPencil } from '@fortawesome/free-solid-svg-icons';
 import AddArtistToSong from '../AddArtistToSong/AddArtistToSong';
 import { useAuthContext } from '../../context/AuthContext';
 import CustomSpinner from '../../icon/spinner';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const SongEditing = () => {
     const { state: authState } = useAuthContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const { id } = useParams();
     const songNameRef = useRef();
@@ -60,7 +66,19 @@ const SongEditing = () => {
     };
 
     const handleChangeImage = (file) => {
-        uploadSongImage(id, file).then((res) => setData(res.data));
+        uploadSongImage(id, file)
+            .then((res) => setData(res.data))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
         setShowUploadImageModal(false);
     };
 
@@ -71,7 +89,17 @@ const SongEditing = () => {
             .then((res) => {
                 setData(res.data);
             })
-            .catch((error) => console.log(error))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
             .finally(() => {
                 setIsLoading(false);
             });
@@ -103,7 +131,19 @@ const SongEditing = () => {
             Number.parseInt(year),
             data.label,
             authState.authData.user.id,
-        ).then((res) => setData(res.data));
+        )
+            .then((res) => setData(res.data))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     };
 
     const handleChangeLyrics = () => {
@@ -120,19 +160,45 @@ const SongEditing = () => {
             Number.parseInt(year),
             data.label,
             authState.authData.user.id,
-        ).then((res) => setData(res.data));
+        )
+            .then((res) => setData(res.data))
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
         setShowLyricsEditor(false);
     };
 
     useEffect(() => {
         setIsLoading(true);
-        getSongById(id).then((res) => {
-            setData(res.data);
-            setMainArtist(res.data.users[0]);
-            setMainAlbum(res.data.albums[0]);
-            setLyrics(res.data.lyric);
-            setIsLoading(false);
-        });
+        getSongById(id)
+            .then((res) => {
+                setData(res.data);
+                setMainArtist(res.data.users[0]);
+                setMainAlbum(res.data.albums[0]);
+                setLyrics(res.data.lyric);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
+            .finally(() => {
+                setIsLoading(false);
+            });
     }, [id]);
 
     useEffect(() => {

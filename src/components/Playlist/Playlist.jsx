@@ -19,6 +19,11 @@ import {
     userDataContextTypes,
 } from '../../context/UserDataContext';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
@@ -27,6 +32,7 @@ const Playlist = () => {
     const { state: userDataState, dispatch: userDataDispatch } =
         useUserDataContext();
     const { state: songState, dispatch: songDispatch } = useSongContext();
+    const { dispatch: dialogDispatch } = useDialogContext();
 
     const { id } = useParams();
     const location = useLocation();
@@ -37,10 +43,22 @@ const Playlist = () => {
 
     useEffect(() => {
         setIsLoading(true);
-        getPlaylistById(id).then((res) => {
-            setData(res.data);
-            setIsLoading(false);
-        });
+        getPlaylistById(id)
+            .then((res) => {
+                setData(res.data);
+                setIsLoading(false);
+            })
+            .catch((error) => {
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            });
     }, [id]);
 
     const totalDuration = () => {
@@ -79,25 +97,47 @@ const Playlist = () => {
 
     const hanldeLikePlaylist = () => {
         if (!isFavPlaylist) {
-            addFavoritePlaylist(authState.authData.user.id, id).then((res) => {
-                console.log(res);
-                userDataDispatch({
-                    type: userDataContextTypes.SET_FAV_PLAYLISTS,
-                    playlists: res.data,
+            addFavoritePlaylist(authState.authData.user.id, id)
+                .then((res) => {
+                    console.log(res);
+                    userDataDispatch({
+                        type: userDataContextTypes.SET_FAV_PLAYLISTS,
+                        playlists: res.data,
+                    });
+                    setIsFavPlaylist(true);
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
                 });
-                setIsFavPlaylist(true);
-            });
         } else {
-            removeFavoritePlaylist(authState.authData.user.id, id).then(
-                (res) => {
+            removeFavoritePlaylist(authState.authData.user.id, id)
+                .then((res) => {
                     console.log(res);
                     userDataDispatch({
                         type: userDataContextTypes.SET_FAV_PLAYLISTS,
                         playlists: res.data,
                     });
                     setIsFavPlaylist(false);
-                },
-            );
+                })
+                .catch((error) => {
+                    console.log(error.message);
+                    dialogDispatch({
+                        type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                        message: {
+                            title: 'Có lỗi xảy ra',
+                            message: error.message,
+                            type: MessageType.ERROR,
+                        },
+                    });
+                });
         }
     };
 

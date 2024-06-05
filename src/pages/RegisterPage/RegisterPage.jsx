@@ -8,10 +8,18 @@ import { useForm } from 'react-hook-form';
 import { register as registerUser } from '../../services/authenticationServices';
 import ConfirmationDialog from '../../dialog/ConfirmationDialog';
 import Loading from '../../components/Loading';
+import CustomSpinner from '../../icon/spinner';
+import {
+    dialogContextTypes,
+    useDialogContext,
+} from '../../context/DialogContext';
+import { MessageType } from '../../dialog/MessageDialog/MessageDialog';
 
 const cx = classNames.bind(styles);
 
 const RegisterPage = () => {
+    const { dispatch: dialogDispatch } = useDialogContext();
+
     const {
         register,
         handleSubmit,
@@ -49,13 +57,20 @@ const RegisterPage = () => {
         setIsLoading(true);
         registerUser(body)
             .then(() => {
-                setIsLoading(false);
                 setShowConfirmDialog(true);
             })
             .catch((error) => {
-                setIsLoading(false);
-                setShowMessageDialog(true);
-            });
+                console.log(error.message);
+                dialogDispatch({
+                    type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                    message: {
+                        title: 'Có lỗi xảy ra',
+                        message: error.message,
+                        type: MessageType.ERROR,
+                    },
+                });
+            })
+            .finally(() => setIsLoading(false));
     };
 
     const handleNavigateToLoginPage = () => {
@@ -229,11 +244,13 @@ const RegisterPage = () => {
                                 </div>
                             </label>
                             <label className={cx('form-group')}>
-                                <input
-                                    type="submit"
-                                    value="Đăng ký"
+                                <button
+                                    className={cx('submit-btn')}
                                     disabled={Object.keys(errors).length > 0}
-                                />
+                                >
+                                    {isLoading && <CustomSpinner />}
+                                    Đăng ký
+                                </button>
                             </label>
                         </form>
                         <div className={cx('register')}>
@@ -252,7 +269,6 @@ const RegisterPage = () => {
                     setShow={setShowConfirmDialog}
                 />
             )}
-            {isLoading && <Loading />}
         </section>
     );
 };

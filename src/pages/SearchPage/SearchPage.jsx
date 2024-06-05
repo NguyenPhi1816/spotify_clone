@@ -4,10 +4,11 @@ import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
 import Playbar from '../../components/Playbar';
 import Categories from '../../components/Categories';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import SearchResult from '../../components/SearchResult';
 
 function SearchPage() {
+    const [isLoading, setIsLoading] = useState(false);
     const [debouncedSearchValue, setDebouncedSearchValue] = useState('');
 
     const handleSearch = (value) => {
@@ -17,10 +18,19 @@ function SearchPage() {
     return (
         <MainLayout
             Sidebar={<Sidebar />}
-            Navbar={<Navbar onSearch={handleSearch} showSearchBar />}
+            Navbar={
+                <Navbar
+                    isLoading={isLoading}
+                    onSearch={handleSearch}
+                    showSearchBar
+                />
+            }
             Content={
                 debouncedSearchValue ? (
-                    <SearchResult searchValue={debouncedSearchValue} />
+                    <SearchResult
+                        searchValue={debouncedSearchValue}
+                        setIsLoading={setIsLoading}
+                    />
                 ) : (
                     <Categories />
                 )

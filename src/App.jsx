@@ -46,31 +46,46 @@ const PreloadData = ({ children }) => {
         if (states) {
             const playlistId = states.currentPlayingListId;
             if (playlistId) {
-                getPlaylistById(playlistId).then((res) => {
-                    const songs = res.data.songs;
-                    const songIndex = states.currentPlayingSongIndex;
-                    const path = `/playlist/${playlistId}`;
-                    const currentSongId = songs[songIndex].id;
+                getPlaylistById(playlistId)
+                    .then((res) => {
+                        const songs = res.data.songs;
+                        const songIndex = states.currentPlayingSongIndex;
+                        const path = `/playlist/${playlistId}`;
+                        const currentSongId = songs[songIndex].id;
 
-                    let currentSong = new Audio(songs[songIndex].audioPath);
-                    if (currentSong) {
-                        currentSong.addEventListener('canplaythrough', () => {
-                            songDispatch({
-                                type: songContextTypes.PRELOAD_DATA,
-                                data: {
-                                    currentPlayingPath: path,
-                                    currentPlayingList: songs,
-                                    currentPlayingSongIndex: songIndex,
-                                    currentPlayingSong: currentSong,
-                                    currentPlayingSongId: currentSongId,
-                                    volume: states.volume,
-                                    isRandom: states.isRandom,
-                                    isLoop: states.isLoop,
+                        let currentSong = new Audio(songs[songIndex].audioPath);
+                        if (currentSong) {
+                            currentSong.addEventListener(
+                                'canplaythrough',
+                                () => {
+                                    songDispatch({
+                                        type: songContextTypes.PRELOAD_DATA,
+                                        data: {
+                                            currentPlayingPath: path,
+                                            currentPlayingList: songs,
+                                            currentPlayingSongIndex: songIndex,
+                                            currentPlayingSong: currentSong,
+                                            currentPlayingSongId: currentSongId,
+                                            volume: states.volume,
+                                            isRandom: states.isRandom,
+                                            isLoop: states.isLoop,
+                                        },
+                                    });
                                 },
-                            });
+                            );
+                        }
+                    })
+                    .catch((error) => {
+                        console.log(error.message);
+                        dialogDispatch({
+                            type: dialogContextTypes.SHOW_MESSAGE_DIALOG,
+                            message: {
+                                title: 'Có lỗi xảy ra',
+                                message: error.message,
+                                type: MessageType.ERROR,
+                            },
                         });
-                    }
-                });
+                    });
             } else {
                 songDispatch({
                     type: songContextTypes.PRELOAD_DATA,

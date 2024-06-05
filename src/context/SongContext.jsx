@@ -105,7 +105,18 @@ const reducer = (state, action) => {
                 isLoading: action.isLoading,
             };
         case songContextTypes.CLEAR_SONG:
-            return initialStates;
+            return {
+                isLoading: false,
+                isPlaying: false,
+                currentPlayingPath: null,
+                currentPlayingList: null,
+                currentPlayingSongIndex: null,
+                currentPlayingSong: null,
+                currentPlayingSongId: null,
+                volume: 1,
+                isRandom: false,
+                isLoop: false,
+            };
         default:
             return state;
     }

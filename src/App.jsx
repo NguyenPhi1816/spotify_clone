@@ -1,6 +1,6 @@
 import './App.scss';
 
-import { Fragment, useEffect, useState } from 'react';
+import { Fragment, useEffect } from 'react';
 import { getAuthCookie, getStatesCookie } from './cookies/getCookie';
 import DialogManager from './components/DialogManager';
 import PropTypes from 'prop-types';
@@ -31,19 +31,17 @@ const PreloadData = ({ children }) => {
         const authData = getAuthCookie();
         if (authData) {
             authDispatch({ type: authContextTypes.LOGIN, payload: authData });
-            authDispatch({
-                type: authContextTypes.SET_LOADING,
-                isLoading: false,
-            });
-        } else {
-            authDispatch({
-                type: authContextTypes.SET_LOADING,
-                isLoading: false,
-            });
         }
+        authDispatch({
+            type: authContextTypes.SET_LOADING,
+            isLoading: false,
+        });
 
         // handle load playbar states from cookie
-        songDispatch({ type: songContextTypes.SET_LOADING, isLoading: true });
+        songDispatch({
+            type: songContextTypes.SET_LOADING,
+            isLoading: true,
+        });
         const states = getStatesCookie();
         if (states) {
             const playlistId = states.currentPlayingListId;
@@ -57,7 +55,7 @@ const PreloadData = ({ children }) => {
                     let currentSong = new Audio(songs[songIndex].audioPath);
                     if (currentSong) {
                         currentSong.addEventListener('canplaythrough', () => {
-                            return songDispatch({
+                            songDispatch({
                                 type: songContextTypes.PRELOAD_DATA,
                                 data: {
                                     currentPlayingPath: path,
@@ -73,23 +71,26 @@ const PreloadData = ({ children }) => {
                         });
                     }
                 });
+            } else {
+                songDispatch({
+                    type: songContextTypes.PRELOAD_DATA,
+                    data: {
+                        currentPlayingPath: null,
+                        currentPlayingList: null,
+                        currentPlayingSongIndex: null,
+                        currentPlayingSong: null,
+                        currentPlayingSongId: null,
+                        volume: states.volume,
+                        isRandom: states.isRandom,
+                        isLoop: states.isLoop,
+                    },
+                });
             }
-
-            return songDispatch({
-                type: songContextTypes.PRELOAD_DATA,
-                data: {
-                    currentPlayingPath: null,
-                    currentPlayingList: null,
-                    currentPlayingSongIndex: null,
-                    currentPlayingSong: null,
-                    currentPlayingSongId: null,
-                    volume: states.volume,
-                    isRandom: states.isRandom,
-                    isLoop: states.isLoop,
-                },
-            });
         }
-        songDispatch({ type: songContextTypes.SET_LOADING, isLoading: false });
+        songDispatch({
+            type: songContextTypes.SET_LOADING,
+            isLoading: false,
+        });
     }, []);
 
     // handle load user data if authData existed in context

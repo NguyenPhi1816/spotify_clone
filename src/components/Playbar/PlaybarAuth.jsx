@@ -19,7 +19,6 @@ import { useState } from 'react';
 import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { songContextTypes, useSongContext } from '../../context/SongContext';
-import { useInteractionContext } from '../../context/InteractionContext';
 
 const cx = classNames.bind(styles);
 
@@ -35,7 +34,6 @@ const PlaybarAuth = () => {
     const HIGH_VALUE = 1;
 
     const { state: songState, dispatch: songDispatch } = useSongContext();
-    const { state: interactionState } = useInteractionContext();
 
     const [playStatus, setPlayStatus] = useState(() => songState.isPlaying);
     const [volumeValue, setVolumeValue] = useState(songState.volume);
@@ -185,7 +183,7 @@ const PlaybarAuth = () => {
                 currentPlayingSong: song,
             });
             setCurrentPlayingSong(song);
-            if (interactionState.isUserFirstInteracted) {
+            if (navigator.userActivation.isActive) {
                 setTimeout(() => {
                     songDispatch({ type: songContextTypes.PLAY_SONG });
                 }, 1000);
